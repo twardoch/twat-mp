@@ -244,3 +244,10 @@ UpgradeLog*.htm
 UpgradeLog*.XML
 x64/
 x86/
+# Python coverage
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.pytest_cache/
+.benchmarks/
