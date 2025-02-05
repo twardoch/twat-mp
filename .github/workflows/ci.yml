@@ -112,7 +112,7 @@ jobs:
 
       # Install build tools using UV
       - name: Install build tools
-        run: uv pip install --system build hatchling hatch-vcs
+        run: uv pip install build hatchling hatch-vcs
 
       - name: Build distributions
         run: uv run python -m build --outdir dist
