@@ -132,7 +132,9 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/project/twat-mp
+      url: https://pypi.org/p/twat-mp
+    permissions:
+      id-token: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -152,8 +154,6 @@ jobs:
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          trusted-publisher: true
 
       - name: Create GitHub Release
         env:
