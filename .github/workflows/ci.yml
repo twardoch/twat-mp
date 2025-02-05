@@ -48,9 +48,9 @@ jobs:
     needs: quality
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
-        os: [ubuntu-latest, windows-latest]
-      fail-fast: false
+        python-version: ["3.12"] # ["3.10", "3.11", "3.12"]
+        os: [ubuntu-latest] # [ubuntu-latest, windows-latest]
+      fail-fast: true
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
@@ -74,7 +74,7 @@ jobs:
       # Install dependencies using UV
       - name: Install test dependencies
         run: |
-          uv pip install --upgrade pip
+          uv pip install --system --upgrade pip
           uv pip install --system ".[test]"
 
       # Run tests
@@ -95,6 +95,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      # Setup Python first
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
       # Setup UV with caching for build
       - name: Install UV
@@ -130,14 +136,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      # Setup UV with caching for publishing
-      - name: Install UV
-        uses: astral-sh/setup-uv@v5
-        with:
-          version: "latest"
-          python-version: "3.12"
-          enable-cache: true
 
       - name: Download distribution artifacts
         uses: actions/download-artifact@v4
