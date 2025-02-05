@@ -97,6 +97,7 @@ lint.extend-select = [
 lint.ignore = [
     "ARG001", # Unused function argument
     "E501",   # Line too long
+    "I001",
 ]
 
 [tool.ruff.format]
