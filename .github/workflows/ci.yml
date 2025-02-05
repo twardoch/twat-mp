@@ -30,16 +30,15 @@ jobs:
 
       # Run Ruff linting
       - name: Run Ruff
-        uses: astral-sh/ruff-action@v1
+        uses: astral-sh/ruff-action@v3
         with:
-          version: "0.3.4"
-          args: check --output-format=github --show-fixes
+          version: "latest"
 
       # Run Ruff formatting check
       - name: Run Ruff Format
-        uses: astral-sh/ruff-action@v1
+        uses: astral-sh/ruff-action@v3
         with:
-          version: "0.3.4"
+          version: "latest"
           args: format --check --diff --output-format=github
 
   # === TEST JOB: Run tests on multiple Python versions and OS (optional) ===
@@ -60,6 +59,7 @@ jobs:
       - name: Install UV
         uses: astral-sh/setup-uv@v5
         with:
+          version: "latest"
           python-version: ${{ matrix.python-version }}
           enable-cache: true
           cache-suffix: ${{ matrix.os }}-${{ matrix.python-version }}
@@ -91,6 +91,7 @@ jobs:
       - name: Install UV
         uses: astral-sh/setup-uv@v5
         with:
+          version: "latest"
           python-version: "3.12"
           enable-cache: true
 
@@ -125,6 +126,7 @@ jobs:
       - name: Install UV
         uses: astral-sh/setup-uv@v5
         with:
+          version: "latest"
           python-version: "3.12"
           enable-cache: true
 

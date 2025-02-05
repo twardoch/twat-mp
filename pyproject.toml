@@ -60,9 +60,7 @@ test = [
 
 ]
 
-dev = [
-    "pre-commit>=3.6.0",
-]
+dev = ["pre-commit>=3.6.0"]
 
 [tool.hatch.envs.test]
 dependencies = [".[test]"]
@@ -90,13 +88,13 @@ all = ["style", "typing"]
 [tool.ruff]
 target-version = "py310"
 line-length = 88
-extend-select = [
+lint.extend-select = [
     "I",   # isort
     "N",   # pep8-naming
     "B",   # flake8-bugbear
     "RUF", # Ruff-specific rules
 ]
-ignore = [
+lint.ignore = [
     "ARG001", # Unused function argument
     "E501",   # Line too long
 ]
