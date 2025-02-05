@@ -3,9 +3,12 @@ name: CI/CD Pipeline
 on:
   push:
     branches: [main]
-    tags: ["v*"] # Trigger on tags starting with "v"
+    tags-ignore: ["v*"] # Ignore tag pushes when branch is pushed
   pull_request:
     branches: [main]
+  # Separate trigger for tags
+  create:
+    tags: ["v*"]
   workflow_dispatch:
 
 permissions:
@@ -128,16 +131,20 @@ jobs:
   publish:
     name: Publish to PyPI
     needs: build
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    if: github.event_name == 'create' && github.event.ref_type == 'tag' && startsWith(github.event.ref, 'v')
     runs-on: ubuntu-latest
     environment:
       name: pypi
       url: https://pypi.org/p/twat-mp
     permissions:
       id-token: write
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.ref }}
 
       - name: Download distribution artifacts
         uses: actions/download-artifact@v4
@@ -158,8 +165,9 @@ jobs:
           password: ${{ secrets.PYPI_TOKEN }}
 
       - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          tag=${GITHUB_REF#refs/tags/}
-          gh release create "$tag" --title "Release $tag" --generate-notes dist/*
