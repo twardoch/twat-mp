@@ -1,19 +1,15 @@
 [build-system]
-requires = [
-    "hatchling>=1.21.0",
-    "hatch-vcs>=0.3.0",
-]
+requires = ["hatchling>=1.21.0", "hatch-vcs>=0.3.0"]
 build-backend = "hatchling.build"
 
-
 [project]
-name = "twat-multi"
+name = "twat-mp"
 dynamic = ["version"]
-description = "Parallel processing utilities using Pathos multiprocessing library"
+description = "Parallel processing utilities using Pathos mpprocessing library"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
-keywords = ["parallel", "multiprocessing", "pathos", "map", "pool"]
+keywords = ["parallel", "mpprocessing", "pathos", "map", "pool"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Programming Language :: Python",
@@ -23,28 +19,22 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
-
-dependencies = [
-    "pathos>=0.3.0",
-]
-
+dependencies = ["pathos>=0.3.0"] # , "twat>=0.0.0"]
 
 [[project.authors]]
 name = "Adam Twardoch"
 email = "adam+github@twardoch.com"
 
-
 [project.urls]
-Documentation = "https://github.com/twardoch/twat-multi#readme"
-Issues = "https://github.com/twardoch/twat-multi/issues"
-Source = "https://github.com/twardoch/twat-multi"
-
+Documentation = "https://github.com/twardoch/twat-mp#readme"
+Issues = "https://github.com/twardoch/twat-mp/issues"
+Source = "https://github.com/twardoch/twat-mp"
 
 [project.entry-points."twat.plugins"]
-multi = "twat_multi"
+mp = "twat_mp"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/twat_multi"]
+packages = ["src/twat_mp"]
 
 [tool.hatch.version]
 source = "vcs"
@@ -53,56 +43,50 @@ source = "vcs"
 version_scheme = "post-release"
 
 [tool.hatch.build.hooks.vcs]
-version-file = "src/twat_multi/__version__.py"
-
-
+version-file = "src/twat_mp/__version__.py"
 
 [tool.hatch.envs.default]
-dependencies = [
-    "pytest",
-    "pytest-cov",
-    "mypy>=1.0.0",
-    "ruff>=0.1.0",
+dependencies = ["mypy>=1.0.0", "ruff>=0.1.0"]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-benchmark[histogram]>=4.0.0",
+    "pytest-xdist>=3.5.0",                # For parallel test execution
+    "pandas>=2.0.0",                      # Required by some test dependencies
+    "numpy>=1.24.0",                      # Required by pandas
+    "matplotlib>=3.7.0",                  # For benchmark visualization
+
 ]
 
+[tool.hatch.envs.test]
+dependencies = [".[test]"]
 
-[tool.hatch.envs.default.scripts]
-test = "pytest {args:tests}"
-test-cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/twat_multi --cov=tests {args:tests}"
-type-check = "mypy src/twat_multi tests"
-lint = ["ruff check src/twat_multi tests", "ruff format src/twat_multi tests"]
-
-
-[[tool.hatch.envs.all.matrix]]
-python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
-
+[tool.hatch.envs.test.scripts]
+# Regular tests can run in parallel
+test = "python -m pytest -n auto {args:tests}"
+test-cov = "python -m pytest -n auto --cov-report=term-missing --cov-config=pyproject.toml --cov=src/twat_mp --cov=tests {args:tests}"
+# Benchmarks must run sequentially
+bench = "python -m pytest -v -p no:briefcase tests/test_benchmark.py --benchmark-only"
+bench-save = "python -m pytest -v -p no:briefcase tests/test_benchmark.py --benchmark-only --benchmark-json=benchmark/results.json"
+bench-hist = "python -m pytest -v -p no:briefcase tests/test_benchmark.py --benchmark-only --benchmark-histogram=benchmark/hist"
+bench-compare = "python -m pytest-benchmark compare benchmark/results.json --sort fullname --group-by func"
 
 [tool.hatch.envs.lint]
 detached = true
-dependencies = [
-    "black>=23.1.0",
-    "mypy>=1.0.0",
-    "ruff>=0.1.0",
-]
-
+dependencies = ["black>=23.1.0", "mypy>=1.0.0", "ruff>=0.1.0"]
 
 [tool.hatch.envs.lint.scripts]
-typing = "mypy --install-types --non-interactive {args:src/twat_multi tests}"
+typing = "mypy --install-types --non-interactive {args:src/twat_mp tests}"
 style = ["ruff check {args:.}", "ruff format {args:.}"]
 fmt = ["ruff format {args:.}", "ruff check --fix {args:.}"]
 all = ["style", "typing"]
 
-
-[tool.black]
-target-version = ["py38"]
-line-length = 88
-skip-string-normalization = true
-
-
 [tool.ruff]
-target-version = "py38"
+target-version = "py310"
 line-length = 88
-select = [
+lint.select = [
     "A",
     "ARG",
     "B",
@@ -129,33 +113,65 @@ select = [
     "W",
     "YTT",
 ]
-ignore = [
-    "PLR0913",  # Too many arguments to function call
-    "ISC001",   # Implicit string concatenation
+lint.ignore = [
+    "PLR0913", # Too many arguments to function call
+    "ISC001",  # Implicit string concatenation
+
 ]
 
-
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101"]
 
-
 [tool.coverage.run]
-source_pkgs = ["twat_multi", "tests"]
+source_pkgs = ["twat_mp", "tests"]
 branch = true
 parallel = true
-omit = [
-    "src/twat_multi/__about__.py",
-]
-
+omit = ["src/twat_mp/__about__.py"]
 
 [tool.coverage.paths]
-twat_multi = ["src/twat_multi", "*/twat-multi/src/twat_multi"]
-tests = ["tests", "*/twat-multi/tests"]
-
+twat_mp = ["src/twat_mp", "*/twat-mp/src/twat_mp"]
+tests = ["tests", "*/twat-mp/tests"]
 
 [tool.coverage.report]
-exclude_lines = [
-    "no cov",
-    "if __name__ == .__main__.:",
-    "if TYPE_CHECKING:",
-] 
+exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+
+[tool.pytest.ini_options]
+markers = ["benchmark: marks tests as benchmarks (select with '-m benchmark')"]
+addopts = "-v -p no:briefcase"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+filterwarnings = ["ignore::DeprecationWarning", "ignore::UserWarning"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.pytest-benchmark]
+min_rounds = 100
+min_time = 0.1
+histogram = true
+storage = "file"
+save-data = true
+compare = [
+    "min",    # Minimum time
+    "max",    # Maximum time
+    "mean",   # Mean time
+    "stddev", # Standard deviation
+    "median", # Median time
+    "iqr",    # Inter-quartile range
+    "ops",    # Operations per second
+    "rounds", # Number of rounds
+
+]
