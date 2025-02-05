@@ -28,23 +28,18 @@ jobs:
         with:
           fetch-depth: 0 # Full history is available if needed by linters
       
-      # Run Ruff linting with full configuration
+      # Run Ruff linting
       - name: Run Ruff
         uses: astral-sh/ruff-action@v1
         with:
-          version: latest
-          args: >
-            check 
-            --output-format=github
-            --target-version=py310
-            --extend-select=I,N,B,RUF
-            --show-fixes
+          version: "0.3.4"
+          args: check --output-format=github --target-version=py310 --extend-select=I,N,B,RUF --show-fixes
       
       # Run Ruff formatting check
       - name: Run Ruff Format
         uses: astral-sh/ruff-action@v1
         with:
-          version: latest
+          version: "0.3.4"
           args: format --check --diff --output-format=github
 
   # === TEST JOB: Run tests on multiple Python versions and OS (optional) ===
