@@ -33,13 +33,14 @@ jobs:
         uses: astral-sh/ruff-action@v3
         with:
           version: "latest"
+          args: "check"
 
       # Run Ruff formatting check
       - name: Run Ruff Format
         uses: astral-sh/ruff-action@v3
         with:
           version: "latest"
-          args: format --check --diff --output-format=github
+          args: "format --check --respect-gitignore"
 
   # === TEST JOB: Run tests on multiple Python versions and OS (optional) ===
   test:
