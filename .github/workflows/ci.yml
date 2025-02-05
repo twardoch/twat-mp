@@ -40,7 +40,7 @@ jobs:
         uses: astral-sh/ruff-action@v3
         with:
           version: "latest"
-          args: "format --check --respect-gitignore --output-format=github"
+          args: "format --check --respect-gitignore"
 
   # === TEST JOB: Run tests on multiple Python versions and OS (optional) ===
   test:
