@@ -4,17 +4,17 @@ Parallel processing utilities using the Pathos multiprocessing library. This pac
 
 ## Features
 
-- Context managers for both process and thread pools:
-  - `ProcessPool`: For CPU-intensive parallel processing
-  - `ThreadPool`: For I/O-bound parallel processing
-- Decorators for common parallel mapping operations:
-  - `amap`: Asynchronous parallel map with automatic result retrieval
-  - `imap`: Lazy parallel map returning an iterator
-  - `pmap`: Standard parallel map (eager evaluation)
-- Automatic CPU core detection for optimal pool sizing
-- Clean resource management with context managers
-- Full type hints and modern Python features
-- Flexible pool configuration with customizable worker count
+* Context managers for both process and thread pools:
+  + `ProcessPool`: For CPU-intensive parallel processing
+  + `ThreadPool`: For I/O-bound parallel processing
+* Decorators for common parallel mapping operations:
+  + `amap`: Asynchronous parallel map with automatic result retrieval
+  + `imap`: Lazy parallel map returning an iterator
+  + `pmap`: Standard parallel map (eager evaluation)
+* Automatic CPU core detection for optimal pool sizing
+* Clean resource management with context managers
+* Full type hints and modern Python features
+* Flexible pool configuration with customizable worker count
 
 ## Installation
 
@@ -104,7 +104,7 @@ results = list(io_intensive(compute_intensive(range(100))))
 
 ## Dependencies
 
-- `pathos`: For parallel processing functionality
+* `pathos`: For parallel processing functionality
 
 ## Development
 

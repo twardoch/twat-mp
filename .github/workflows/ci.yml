@@ -56,6 +56,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Setup Python first
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
       # Setup UV with caching enabled
       - name: Install UV
         uses: astral-sh/setup-uv@v5
@@ -67,7 +73,9 @@ jobs:
 
       # Install dependencies using UV
       - name: Install test dependencies
-        run: uv pip install --system ".[test]"
+        run: |
+          python -m pip install --upgrade pip
+          uv pip install --system ".[test]"
 
       # Run tests
       - name: Run tests with Pytest
