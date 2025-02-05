@@ -5,7 +5,6 @@ from collections.abc import Iterator
 from typing import TypeVar
 
 import pytest
-
 from twat_mp import ProcessPool, ThreadPool, amap, imap, mmap, pmap
 from twat_mp.__version__ import version as __version__
 

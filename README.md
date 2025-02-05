@@ -123,4 +123,4 @@ python -m pytest tests/test_benchmark.py
 
 ## License
 
-MIT License 
+MIT License

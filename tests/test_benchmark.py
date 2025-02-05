@@ -4,7 +4,6 @@ from collections.abc import Callable, Iterator
 from typing import Any
 
 import pytest
-
 from twat_mp import ProcessPool, ThreadPool, amap, imap, mmap, pmap
 
 
