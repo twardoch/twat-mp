@@ -19,7 +19,7 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
-dependencies = ["pathos>=0.3.0"] # , "twat>=0.0.0"]
+dependencies = ["pathos>=0.3.0", "twat>=1.0.0"]
 
 [[project.authors]]
 name = "Adam Twardoch"
