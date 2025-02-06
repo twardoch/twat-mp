@@ -1,4 +1,6 @@
-# twat_mp
+# twat-mp
+
+(work in progress)
 
 Parallel processing utilities using the Pathos multiprocessing library. This package provides convenient context managers and decorators for parallel processing, with both process-based and thread-based pools.
 
