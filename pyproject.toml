@@ -62,6 +62,8 @@ test = [
 
 dev = ["pre-commit>=3.6.0"]
 
+all = ["twat>=1.0.0", "pathos>=0.3.0"]
+
 [tool.hatch.envs.test]
 dependencies = [".[test]"]
 
