@@ -20,13 +20,17 @@ Example usage:
     [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
 """
 
-from collections.abc import Callable, Iterator
+from __future__ import annotations
+
 from functools import wraps
-from typing import Any, Literal, TypeVar
+from typing import TYPE_CHECKING, Any, Literal, TypeVar
 
 from pathos.helpers import mp  # Provides CPU count helper
 from pathos.pools import ProcessPool as PathosProcessPool
 from pathos.pools import ThreadPool as PathosThreadPool
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterator
 
 # Type variables for generality in mapping functions
 T = TypeVar("T")

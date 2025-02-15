@@ -1,10 +1,15 @@
 """Benchmark tests for twat_mp."""
 
-from collections.abc import Callable, Iterator
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 import pytest
+
 from twat_mp import ProcessPool, ThreadPool, amap, imap, mmap, pmap
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterator
 
 
 def _compute_intensive(x: int) -> int:
