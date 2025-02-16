@@ -1,13 +1,25 @@
-[build-system]
-requires = ["hatchling>=1.21.0", "hatch-vcs>=0.3.0"]
-build-backend = "hatchling.build"
+# this_file: twat_mp/pyproject.toml
 
+# Build System Configuration
+# -------------------------
+# Specifies the build system and its requirements for packaging the project
+# Specifies the build backend and its requirements for building the package
+[build-system]
+requires = [
+    "hatchling>=1.27.0",     # Core build backend for Hatch
+    "hatch-vcs>=0.4.0",      # Version Control System plugin for Hatch
+]
+build-backend = "hatchling.build"  # Use Hatchling as the build backend
+
+# Project Metadata Configuration
+# ------------------------------
+# Comprehensive project description, requirements, and compatibility information
 [project]
 name = "twat-mp"
-dynamic = ["version"]
+dynamic = ["version"]  # Version is determined dynamically from VCS
 description = "Parallel processing utilities using Pathos mpprocessing library"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10"  # Minimum Python version required
 license = "MIT"
 keywords = ["parallel", "mpprocessing", "pathos", "map", "pool"]
 classifiers = [
@@ -19,7 +31,14 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
-dependencies = ["pathos>=0.3.0", "twat>=1.0.0"]
+
+# Runtime Dependencies
+# -------------------
+# External packages required for the project to function
+dependencies = [
+    "pathos>=0.3.0",         # Parallel processing library
+    "twat>=1.8.1",           # Main twat package
+]
 
 [[project.authors]]
 name = "Adam Twardoch"
