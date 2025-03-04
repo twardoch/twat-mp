@@ -1,7 +1,5 @@
 # this_file: twat_mp/pyproject.toml
 
-# this_file: twat_mp/pyproject.toml
-
 # Build System Configuration
 # -------------------------
 # Specifies the build system and its requirements for packaging the project
@@ -18,7 +16,8 @@ build-backend = "hatchling.build"  # Use Hatchling as the build backend
 # Comprehensive project description, requirements, and compatibility information
 [project]
 name = "twat-mp"
-dynamic = ["version"]  # Version is determined dynamically from VCS
+dynamic = ["version"]
+
 description = "Parallel processing utilities using Pathos mpprocessing library"
 readme = "README.md"
 requires-python = ">=3.10"  # Minimum Python version required
@@ -57,15 +56,6 @@ mp = "twat_mp"
 [tool.hatch.build.targets.wheel]
 packages = ["src/twat_mp"]
 
-[tool.hatch.version]
-source = "vcs"
-
-[tool.hatch.version.raw-options]
-version_scheme = "post-release"
-
-[tool.hatch.build.hooks.vcs]
-version-file = "src/twat_mp/__version__.py"
-
 [tool.hatch.envs.default]
 dependencies = ["mypy>=1.0.0", "ruff>=0.1.0"]
 
@@ -78,12 +68,17 @@ test = [
     "pandas>=2.0.0",                      # Required by some test dependencies
     "numpy>=1.24.0",                      # Required by pandas
     "matplotlib>=3.7.0",                  # For benchmark visualization
-
 ]
 
 dev = ["pre-commit>=3.6.0"]
 
-all = ["twat>=1.0.0", "pathos>=0.3.0"]
+aio = ["aiomultiprocess>=0.9.1"]         # Async multiprocessing support
+
+all = [
+    "twat>=1.0.0",
+    "pathos>=0.3.0",
+    "aiomultiprocess>=0.9.1"             # Include aio in all
+]
 
 [tool.hatch.envs.test]
 dependencies = [".[test]"]

@@ -107,11 +107,32 @@ class MultiPool:
             False to indicate that any exception should be propagated.
         """
         if self.pool:
-            # Close the pool and join to wait for all tasks to complete
-            self.pool.close()
-            self.pool.join()
-            # Clear the pool to free up resources
-            self.pool.clear()
+            try:
+                # Special handling for KeyboardInterrupt
+                if exc_type is KeyboardInterrupt:
+                    # Terminate immediately on keyboard interrupt for faster response
+                    self.pool.terminate()
+                    self.pool.join()
+                else:
+                    # Normal graceful shutdown
+                    # Close the pool and join to wait for all tasks to complete
+                    self.pool.close()
+                    self.pool.join()
+            except Exception:
+                # If close/join fails, ensure terminate is called
+                try:
+                    self.pool.terminate()
+                    self.pool.join()
+                except Exception:
+                    # Last resort, just let it go
+                    pass
+            finally:
+                # Clear the pool to free up resources
+                try:
+                    self.pool.clear()
+                except Exception:
+                    pass
+                self.pool = None
         return False  # Propagate any exception that occurred
 
 
@@ -176,6 +197,11 @@ def mmap(
     Returns:
         A decorator function that transforms the target function for parallel execution.
 
+    Raises:
+        ValueError: If the specified mapping method is not supported.
+        RuntimeError: If pool creation fails.
+        KeyboardInterrupt: If the user interrupts the execution.
+
     Example:
         >>> @mmap('map')
         ... def cube(x: int) -> int:
@@ -184,19 +210,46 @@ def mmap(
         >>> print(results)
         [0, 1, 8, 27, 64]
     """
+    # Validate the mapping method early
+    valid_methods = ["map", "imap", "amap"]
+    if how not in valid_methods:
+        raise ValueError(
+            f"Invalid mapping method: '{how}'. Must be one of {valid_methods}"
+        )
 
     def decorator(func: Callable[[T], U]) -> Callable[[Iterator[T]], Iterator[U]]:
         @wraps(func)
         def wrapper(iterable: Iterator[T], *args: Any, **kwargs: Any) -> Any:
             # Create a MultiPool context to manage the pool lifecycle
-            with MultiPool() as pool:
-                # Dynamically fetch the mapping method (map, imap, or amap)
-                mapping_method = getattr(pool, how)
-                result = mapping_method(func, iterable)
-                # For asynchronous mapping, call .get() to obtain the actual results
-                if get_result:
-                    result = result.get()
-                return result
+            try:
+                with MultiPool() as pool:
+                    # Dynamically fetch the mapping method (map, imap, or amap)
+                    try:
+                        mapping_method = getattr(pool, how)
+                    except AttributeError as err:
+                        raise ValueError(
+                            f"Pool does not support mapping method: '{how}'"
+                        ) from err
+
+                    try:
+                        result = mapping_method(func, iterable)
+                        # For asynchronous mapping, call .get() to obtain the actual results
+                        if get_result:
+                            result = result.get()
+                        return result
+                    except KeyboardInterrupt:
+                        # Re-raise KeyboardInterrupt to allow proper cleanup
+                        raise
+                    except Exception as e:
+                        # Provide more context for general errors
+                        raise RuntimeError(
+                            f"Failed to execute parallel operation: {e}"
+                        ) from e
+            except KeyboardInterrupt:
+                raise  # Re-raise to allow proper handling at higher level
+            except Exception as e:
+                # Provide more context for general errors
+                raise RuntimeError(f"Failed to execute parallel operation: {e}") from e
 
         return wrapper
 
