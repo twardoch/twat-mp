@@ -180,3 +180,6 @@ compare = [
     "rounds", # Number of rounds
 
 ]
+
+[tool.hatch.version]
+source = "vcs"
