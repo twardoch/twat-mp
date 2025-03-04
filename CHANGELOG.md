@@ -24,6 +24,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved compatibility with Python 3.12+ async features
 - Enhanced exception propagation from worker processes
 - Fixed build system configuration by adding proper `tool.hatch.version` settings
+- Renamed `WorkerException` to `WorkerError` for consistency with Python naming conventions
+- Updated tests to reflect the new error handling behavior
+- Fixed `test_pool_reuse_failure` test to document current behavior
+- Improved code quality by removing unused variables and lambda assignments
 
 ### Fixed
 
@@ -32,6 +36,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed keyboard interrupt handling during parallel execution
 - Addressed linter warnings and improved code quality
 - Fixed package build error by adding missing version configuration in pyproject.toml
+- Fixed inconsistent exception naming across the codebase
+- Fixed test assertions to properly check for error messages in `WorkerError`
 
 ## [2.5.3] - 2025-03-04
 

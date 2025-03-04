@@ -6,14 +6,10 @@ this_file: TODO.md
 
 Tip: Periodically run `python ./cleanup.py status` to see results of lints and tests. Use `uv pip ...` not `pip ...`
 
-## Phase 0
-
-- [ ] Adapt tests to new naming
 
 ## Phase 1
 
 - [ ] Add a CLI interface for common operations
-
 - [ ] Add support for cancellation of running tasks
 - [ ] Implement progress tracking for long-running parallel operations
 - [ ] Implement backpressure mechanisms for memory-intensive operations
@@ -31,8 +27,6 @@ Tip: Periodically run `python ./cleanup.py status` to see results of lints and t
 - [ ] Add tests for resource leaks and memory usage
 - [ ] Add tests for different Python versions and platforms
 - [ ] Implement property-based testing for robustness
-- [ ] Add tests for keyboard interrupt handling during execution
-- [ ] Implement regression tests for fixed bugs
 
 ## Phase 3
 
@@ -47,7 +41,6 @@ Tip: Periodically run `python ./cleanup.py status` to see results of lints and t
 
 - [ ] Implement compatibility with other multiprocessing libraries
 - [ ] Add support for distributed processing across multiple machines
-- [x] Ensure compatibility with containerized environments
 - [ ] Add support for GPU acceleration where applicable
 - [ ] Implement integration with dask and other distributed computing frameworks
 - [ ] Add support for cloud-based parallel processing
@@ -56,7 +49,6 @@ Tip: Periodically run `python ./cleanup.py status` to see results of lints and t
 
 - [ ] Implement automatic pool selection based on workload characteristics
 - [ ] Add progress bars and status reporting for long-running tasks
-- [ ] Add more intuitive error recovery suggestions
 - [ ] Create wizard-like interfaces for common operations
 
 ## Package Management
@@ -65,4 +57,3 @@ Tip: Periodically run `python ./cleanup.py status` to see results of lints and t
 - [ ] Implement automated release process with GitHub Actions
 - [ ] Add support for Windows-specific optimizations
 - [ ] Create development documentation for contributors
-- [ ] Implement pre-commit hooks for code quality
