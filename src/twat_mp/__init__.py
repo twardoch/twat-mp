@@ -4,7 +4,11 @@ twat-mp - Parallel processing utilities for twat using pathos and aiomultiproces
 
 from twat_mp.mp import MultiPool, ProcessPool, ThreadPool, amap, imap, mmap, pmap
 
-__version__ = "1.8.0"
+try:
+    from twat_mp.__version__ import __version__
+except ImportError:
+    __version__ = "0.0.0"
+
 
 __all__ = [
     "MultiPool",
@@ -15,6 +19,7 @@ __all__ = [
     "imap",
     "mmap",
     "pmap",
+    "__version__",
 ]
 
 try:

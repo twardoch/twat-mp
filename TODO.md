@@ -6,38 +6,16 @@ this_file: TODO.md
 
 Tip: Periodically run `./cleanup.py status` to see results of lints and tests.
 
-## High Priority
+## Phase 1
 
-- [ ] Fix version inconsistency between VERSION.txt (v2.5.3) and __version__.py (1.8.1.post2+gba50f5f)
-- [ ] Update __init__.py version to match the current package version
-- [ ] Create a LOG.md file to track development progress (required by cleanup.py)
-- [ ] Fix cleanup.py script to properly display status output
 - [ ] Add proper docstrings to all public functions and classes
-
-## Medium Priority
-
 - [ ] Improve error handling in AsyncMultiPool.__aexit__ for better resource cleanup
 - [ ] Add more comprehensive unit tests for edge cases
 - [ ] Enhance exception propagation from worker processes
 - [ ] Implement debug mode with detailed logging
 - [ ] Add more real-world examples in documentation
 
-## Low Priority
-
-- [ ] Create interactive examples in Jupyter notebooks
-- [ ] Add architecture diagrams explaining component relationships
-- [ ] Optimize performance for large datasets
-- [ ] Add benchmarking tools for comparing different pool implementations
-- [ ] Improve compatibility with Python 3.12+ async features
-
-## Completed Tasks
-
-- [x] Fixed build system configuration by adding proper `tool.hatch.version` settings
-- [x] Updated CHANGELOG.md with recent changes
-- [x] Updated README.md with information about recent updates
-- [x] Fixed package build error related to missing version configuration
-
-## Code Quality and Structure
+## Phase 2
 
 - [ ] Implement consistent error handling across all modules
 - [ ] Refactor code to reduce duplication between mp.py and async_mp.py
@@ -46,7 +24,7 @@ Tip: Periodically run `./cleanup.py status` to see results of lints and tests.
 - [ ] Add comprehensive documentation for error handling strategies
 - [ ] Improve exception propagation from worker processes to main process
 
-## Features and Enhancements
+## Phase 3
 
 - [ ] Add support for cancellation of running tasks
 - [ ] Implement progress tracking for long-running parallel operations

@@ -6,7 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
 ### Added
+
 - Created comprehensive API reference documentation
 - Added architecture diagrams explaining component relationships and workflows
 - Added real-world examples for image processing, data processing, web scraping, and file operations
@@ -15,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implemented debug mode with detailed logging
 
 ### Changed
+
 - Improved resource cleanup in AsyncMultiPool.__aexit__ using close() instead of terminate()
 - Enhanced error handling during pool cleanup to ensure proper resource management
 - Updated docstrings with more examples and clearer explanations
@@ -23,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed build system configuration by adding proper `tool.hatch.version` settings
 
 ### Fixed
+
 - Fixed AttributeError handling in exception handling code
 - Improved graceful shutdown mechanism with better signal handling
 - Fixed keyboard interrupt handling during parallel execution
@@ -30,16 +34,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed package build error by adding missing version configuration in pyproject.toml
 
 ## [2.5.3] - 2025-03-04
+
 ### Added
+
 - Added proper version configuration in pyproject.toml using hatch-vcs
 - Improved build system configuration for better package distribution
+- Created LOG.md file to track development progress (now merged into CHANGELOG.md)
+- Updated TODO.md with prioritized tasks
 
 ### Fixed
+
 - Fixed package build error related to missing version configuration
 - Ensured proper version extraction from Git tags
 
+### Changed
+
+- Updated CHANGELOG.md with recent changes
+- Updated README.md with information about recent updates
+
 ## [2.0.0] - 2025-02-20
+
 ### Added
+
 - Added async support via `aiomultiprocess` integration
 - New `AsyncMultiPool` class for combining async/await with multiprocessing
 - New `apmap` decorator for easy async parallel processing
@@ -47,15 +63,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Documentation for async features
 
 ### Changed
+
 - Updated project dependencies to include optional `aiomultiprocess` support
 - Enhanced type hints and error handling across the codebase
 - Changed version handling to use static version instead of VCS-based versioning
 
 ## [1.7.5] - 2025-02-15
+
+### Added
+
+- Implemented AsyncMultiPool class for combining async/await with multiprocessing
+- Added apmap decorator for easy async parallel processing
+- Created comprehensive test suite for async functionality
+
 ### Changed
+
 - Optimized CI/CD pipeline with improved GitHub Actions workflow
 - Enhanced stability and performance optimizations in core multiprocessing functions
 - Updated documentation and README with clearer usage examples
+- Updated project dependencies to include optional aiomultiprocess support
+- Enhanced type hints and error handling across the codebase
 
 [Unreleased]: https://github.com/twardoch/twat-mp/compare/v2.5.3...HEAD
 [2.5.3]: https://github.com/twardoch/twat-mp/compare/v2.0.0...v2.5.3
