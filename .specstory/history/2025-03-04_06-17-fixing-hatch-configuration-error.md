@@ -100,6 +100,65 @@ Read current @TODO.md , update @CHANGELOG.md file that details all the changes w
 
 _**Assistant**_
 
+I'll help you update the project documentation and run the cleanup script to check the status of lints and tests. Let me start by exploring the project structure to get a better understanding of what we're working with.
+
+---
+
+_****_
+
+<details>
+            <summary>Listed current directory • **27** results</summary>
+
+| Name |
+|-------|
+| 📄 `TODO.md` |
+| 📁 `.git` |
+| 📄 `VERSION.txt` |
+| 📁 `dist` |
+| 📄 `pyproject.toml` |
+| 📄 `CLEANUP.txt` |
+| 📄 `CHANGELOG.md` |
+| 📄 `twat_search.txt` |
+| 📁 `.venv` |
+| 📄 `README.md` |
+| 📄 `API_REFERENCE.md` |
+| 📁 `docs` |
+| 📁 `.mypy_cache` |
+| 📁 `.ruff_cache` |
+| 📁 `tests` |
+| 📁 `.specstory` |
+| 📄 `cleanup.py` |
+| 📄 `.DS_Store` |
+| 📄 `CLEANUP.log` |
+| 📁 `.benchmarks` |
+| 📁 `.cursor` |
+| 📁 `.pytest_cache` |
+| 📄 `.gitignore` |
+| 📁 `.github` |
+| 📄 `.pre-commit-config.yaml` |
+| 📄 `LICENSE` |
+| 📁 `src` |
+
+</details>
+
+---
+
+_****_
+
+
+
+Let's first check the content of the CHANGELOG.md file to understand what changes have been made so far:
+
+---
+
+_****_
+
+Read file: CHANGELOG.md
+
+---
+
+_****_
+
 
 
 ---
@@ -107,3 +166,4 @@ _**Assistant**_
 
 
 ---
+

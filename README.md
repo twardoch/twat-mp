@@ -19,6 +19,15 @@ Parallel processing utilities using Pathos and aiomultiprocess libraries. This p
 * Flexible pool configuration with customizable worker count
 * Graceful error handling and resource cleanup
 * Optional dependencies to reduce installation footprint
+* Version control system (VCS) based versioning using hatch-vcs
+
+## Recent Updates
+
+* Fixed build system configuration with proper version handling
+* Enhanced error handling and resource cleanup
+* Improved compatibility with Python 3.12+ async features
+* Added comprehensive API reference documentation
+* Added real-world examples for various use cases
 
 ## Installation
 

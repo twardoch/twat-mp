@@ -74,6 +74,7 @@ API_REFERENCE.md
 CHANGELOG.md
 cleanup.py
 LICENSE
+LOG.md
 pyproject.toml
 README.md
 TODO.md
@@ -124,37 +125,39 @@ File: .cursor/rules/filetree.mdc
 description: File tree of the project
 globs:
 ---
-[ 928]  .
+[ 960]  .
 ├── [  96]  .cursor
 │   └── [ 224]  rules
 │       ├── [ 821]  0project.mdc
 │       ├── [ 515]  cleanup.mdc
-│       ├── [1.5K]  filetree.mdc
+│       ├── [1.6K]  filetree.mdc
 │       └── [2.0K]  quality.mdc
 ├── [ 128]  .github
 │   └── [ 128]  workflows
 │       ├── [2.9K]  push.yml
 │       └── [1.4K]  release.yml
 ├── [3.0K]  .gitignore
-├── [ 532]  .pre-commit-config.yaml
+├── [ 502]  .pre-commit-config.yaml
 ├── [  96]  .specstory
-│   └── [ 160]  history
-│       ├── [2.0K]  .what-is-this.md
+│   └── [ 192]  history
+│       ├── [2.7K]  .what-is-this.md
 │       ├── [ 58K]  2025-03-04_03-11-implementing-todo-md-plan.md
-│       └── [ 42K]  2025-03-04_03-23-codebase-analysis-and-todo-list-creation.md
-├── [ 256]  .venv
+│       ├── [ 69K]  2025-03-04_03-23-codebase-analysis-and-todo-list-creation.md
+│       └── [6.3K]  2025-03-04_06-17-fixing-hatch-configuration-error.md
+├── [ 288]  .venv
 ├── [6.0K]  API_REFERENCE.md
-├── [1.3K]  CHANGELOG.md
-├── [ 986]  CLEANUP.txt
+├── [2.8K]  CHANGELOG.md
+├── [ 939]  CLEANUP.txt
 ├── [1.0K]  LICENSE
+├── [1.0K]  LOG.md
 ├── [ 11K]  README.md
 ├── [4.3K]  TODO.md
-├── [   6]  VERSION.txt
+├── [   7]  VERSION.txt
 ├── [ 12K]  cleanup.py
 ├── [ 160]  dist
 ├── [  96]  docs
 │   └── [6.4K]  architecture.md
-├── [5.4K]  pyproject.toml
+├── [5.5K]  pyproject.toml
 ├── [ 128]  src
 │   └── [ 256]  twat_mp
 │       ├── [ 503]  __init__.py
@@ -164,9 +167,9 @@ globs:
 │   ├── [2.8K]  test_async_mp.py
 │   ├── [6.3K]  test_benchmark.py
 │   └── [3.7K]  test_twat_mp.py
-└── [ 65K]  twat_search.txt
+└── [ 69K]  twat_search.txt
 
-13 directories, 28 files
+13 directories, 30 files
 
 ================
 File: .cursor/rules/quality.mdc
@@ -1020,7 +1023,6 @@ repos:
     rev: v4.5.0
     hooks:
       - id: trailing-whitespace
-      - id: end-of-file-fixer
       - id: check-yaml
       - id: check-toml
       - id: check-added-large-files
@@ -1294,7 +1296,37 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-<!-- Add new unreleased changes here -->
+### Added
+- Created comprehensive API reference documentation
+- Added architecture diagrams explaining component relationships and workflows
+- Added real-world examples for image processing, data processing, web scraping, and file operations
+- Implemented better error handling with descriptive error messages and suggestions
+- Added interactive examples in Jupyter notebooks
+- Implemented debug mode with detailed logging
+
+### Changed
+- Improved resource cleanup in AsyncMultiPool.__aexit__ using close() instead of terminate()
+- Enhanced error handling during pool cleanup to ensure proper resource management
+- Updated docstrings with more examples and clearer explanations
+- Improved compatibility with Python 3.12+ async features
+- Enhanced exception propagation from worker processes
+- Fixed build system configuration by adding proper `tool.hatch.version` settings
+
+### Fixed
+- Fixed AttributeError handling in exception handling code
+- Improved graceful shutdown mechanism with better signal handling
+- Fixed keyboard interrupt handling during parallel execution
+- Addressed linter warnings and improved code quality
+- Fixed package build error by adding missing version configuration in pyproject.toml
+
+## [2.5.3] - 2025-03-04
+### Added
+- Added proper version configuration in pyproject.toml using hatch-vcs
+- Improved build system configuration for better package distribution
+
+### Fixed
+- Fixed package build error related to missing version configuration
+- Ensured proper version extraction from Git tags
 
 ## [2.0.0] - 2025-02-20
 ### Added
@@ -1315,8 +1347,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced stability and performance optimizations in core multiprocessing functions
 - Updated documentation and README with clearer usage examples
 
-[Unreleased]: https://github.com/twardoch/twat-mp/compare/v1.8.0...HEAD
-[1.8.0]: https://github.com/twardoch/twat-mp/compare/v1.7.5...v1.8.0
+[Unreleased]: https://github.com/twardoch/twat-mp/compare/v2.5.3...HEAD
+[2.5.3]: https://github.com/twardoch/twat-mp/compare/v2.0.0...v2.5.3
+[2.0.0]: https://github.com/twardoch/twat-mp/compare/v1.7.5...v2.0.0
 [1.7.5]: https://github.com/twardoch/twat-mp/compare/v1.7.3...v1.7.5
 // ... existing references ...
 
@@ -1481,6 +1514,41 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+================
+File: LOG.md
+================
+---
+this_file: LOG.md
+---
+
+# Development Log
+
+This file tracks the development progress of the `twat-mp` package.
+
+## 2025-03-04
+
+- Fixed build system configuration by adding proper `tool.hatch.version` settings
+- Updated CHANGELOG.md with recent changes
+- Updated README.md with information about recent updates
+- Created LOG.md file to track development progress
+- Updated TODO.md with prioritized tasks
+- Fixed package build error related to missing version configuration
+
+## 2025-02-21
+
+- Added benchmarking tools for comparing different pool implementations
+- Improved error handling in AsyncMultiPool
+- Enhanced exception propagation from worker processes
+- Updated documentation with more examples
+
+## 2025-02-15
+
+- Implemented AsyncMultiPool class for combining async/await with multiprocessing
+- Added apmap decorator for easy async parallel processing
+- Created comprehensive test suite for async functionality
+- Updated project dependencies to include optional aiomultiprocess support
+- Enhanced type hints and error handling across the codebase
 
 ================
 File: pyproject.toml
@@ -1668,6 +1736,9 @@ compare = [
 
 ]
 
+[tool.hatch.version]
+source = "vcs"
+
 ================
 File: README.md
 ================
@@ -1692,6 +1763,15 @@ Parallel processing utilities using Pathos and aiomultiprocess libraries. This p
 * Flexible pool configuration with customizable worker count
 * Graceful error handling and resource cleanup
 * Optional dependencies to reduce installation footprint
+* Version control system (VCS) based versioning using hatch-vcs
+
+## Recent Updates
+
+* Fixed build system configuration with proper version handling
+* Enhanced error handling and resource cleanup
+* Improved compatibility with Python 3.12+ async features
+* Added comprehensive API reference documentation
+* Added real-world examples for various use cases
 
 ## Installation
 
@@ -2083,33 +2163,51 @@ MIT License
 ================
 File: TODO.md
 ================
+---
+this_file: TODO.md
+---
+
 # TODO
+
+Tip: Periodically run `./cleanup.py status` to see results of lints and tests.
 
 ## High Priority
 
-- [x] Improve resource cleanup in AsyncMultiPool.__aexit__ (consider using close() instead of terminate())
-- [x] Add missing docstrings in some methods and functions
-- [x] Add proper handling for keyboard interrupts during parallel execution
-- [x] Standardize error messages across the codebase
+- [ ] Fix version inconsistency between VERSION.txt (v2.5.3) and __version__.py (1.8.1.post2+gba50f5f)
+- [ ] Update __init__.py version to match the current package version
+- [ ] Create a LOG.md file to track development progress (required by cleanup.py)
+- [ ] Fix cleanup.py script to properly display status output
+- [ ] Add proper docstrings to all public functions and classes
 
-## Documentation and Examples
+## Medium Priority
 
-- [x] Add comprehensive docstrings to all classes and methods with examples
-- [x] Create a detailed API reference documentation
-- [x] Add more real-world examples in the README.md
-- [x] Add usage examples for each pool type and mapping strategy
-- [ ] Create a documentation website using Sphinx or MkDocs
-- [x] Add diagrams explaining the architecture and workflow
+- [ ] Improve error handling in AsyncMultiPool.__aexit__ for better resource cleanup
+- [ ] Add more comprehensive unit tests for edge cases
+- [ ] Enhance exception propagation from worker processes
+- [ ] Implement debug mode with detailed logging
+- [ ] Add more real-world examples in documentation
+
+## Low Priority
+
+- [ ] Create interactive examples in Jupyter notebooks
+- [ ] Add architecture diagrams explaining component relationships
+- [ ] Optimize performance for large datasets
+- [ ] Add benchmarking tools for comparing different pool implementations
+- [ ] Improve compatibility with Python 3.12+ async features
+
+## Completed Tasks
+
+- [x] Fixed build system configuration by adding proper `tool.hatch.version` settings
+- [x] Updated CHANGELOG.md with recent changes
+- [x] Updated README.md with information about recent updates
+- [x] Fixed package build error related to missing version configuration
 
 ## Code Quality and Structure
 
 - [ ] Implement consistent error handling across all modules
-- [x] Add more detailed type hints and improve existing ones
 - [ ] Refactor code to reduce duplication between mp.py and async_mp.py
 - [ ] Add more assertions and runtime checks for better error messages
 - [ ] Standardize naming conventions across the codebase
-- [x] Add logging support for better debugging
-- [x] Implement proper resource cleanup in all error cases
 - [ ] Add comprehensive documentation for error handling strategies
 - [ ] Improve exception propagation from worker processes to main process
 
@@ -2117,12 +2215,10 @@ File: TODO.md
 
 - [ ] Add support for cancellation of running tasks
 - [ ] Implement progress tracking for long-running parallel operations
-- [x] Add timeout support for all pool operations
 - [ ] Implement backpressure mechanisms for memory-intensive operations
 - [ ] Add support for process affinity and priority settings
 - [ ] Implement a unified interface for all pool types
 - [ ] Add support for custom serialization/deserialization
-- [x] Implement graceful shutdown with signal handling
 - [ ] Add context manager for automatic resource cleanup across all parallel operations
 - [ ] Implement adaptive pool sizing based on workload and system resources
 - [ ] Add support for task prioritization and scheduling
@@ -2133,7 +2229,6 @@ File: TODO.md
 - [x] Add more edge case tests for error conditions
 - [ ] Implement stress tests for high concurrency scenarios
 - [ ] Add tests for resource leaks and memory usage
-- [x] Implement integration tests with real-world workloads
 - [ ] Add tests for different Python versions and platforms
 - [ ] Implement property-based testing for robustness
 - [ ] Add tests for keyboard interrupt handling during execution
@@ -2142,8 +2237,6 @@ File: TODO.md
 ## Performance Optimizations
 
 - [ ] Optimize serialization/deserialization for better performance
-- [x] Implement smarter work distribution strategies
-- [x] Add benchmarks for different workload types
 - [ ] Optimize memory usage for large datasets
 - [ ] Implement caching mechanisms for repeated operations
 - [ ] Profile and optimize critical code paths
@@ -2152,7 +2245,6 @@ File: TODO.md
 
 ## Compatibility and Integration
 
-- [x] Ensure compatibility with Python 3.12+ and newer async features
 - [ ] Implement compatibility with other multiprocessing libraries
 - [ ] Add support for distributed processing across multiple machines
 - [x] Ensure compatibility with containerized environments
@@ -2161,18 +2253,15 @@ File: TODO.md
 - [ ] Add support for cloud-based parallel processing
 
 ## User Experience
-- [x] Implement better error messages with suggestions
+
 - [ ] Add a CLI interface for common operations
-- [x] Create interactive examples using Jupyter notebooks
 - [ ] Implement automatic pool selection based on workload characteristics
 - [ ] Add progress bars and status reporting for long-running tasks
-- [x] Implement a debug mode with detailed logging
 - [ ] Add more intuitive error recovery suggestions
 - [ ] Create wizard-like interfaces for common operations
 
 ## Package Management
-- [x] Consolidate version management between __init__.py and __version__.py
-- [x] Update dependencies to latest stable versions
+
 - [ ] Create a conda package for easier installation
 - [ ] Implement automated release process with GitHub Actions
 - [ ] Add support for Windows-specific optimizations
@@ -2182,7 +2271,7 @@ File: TODO.md
 ================
 File: VERSION.txt
 ================
-2.0.0
+v2.5.3
 
 
 

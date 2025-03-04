@@ -20,12 +20,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated docstrings with more examples and clearer explanations
 - Improved compatibility with Python 3.12+ async features
 - Enhanced exception propagation from worker processes
+- Fixed build system configuration by adding proper `tool.hatch.version` settings
 
 ### Fixed
 - Fixed AttributeError handling in exception handling code
 - Improved graceful shutdown mechanism with better signal handling
 - Fixed keyboard interrupt handling during parallel execution
 - Addressed linter warnings and improved code quality
+- Fixed package build error by adding missing version configuration in pyproject.toml
+
+## [2.5.3] - 2025-03-04
+### Added
+- Added proper version configuration in pyproject.toml using hatch-vcs
+- Improved build system configuration for better package distribution
+
+### Fixed
+- Fixed package build error related to missing version configuration
+- Ensured proper version extraction from Git tags
 
 ## [2.0.0] - 2025-02-20
 ### Added
@@ -46,7 +57,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced stability and performance optimizations in core multiprocessing functions
 - Updated documentation and README with clearer usage examples
 
-[Unreleased]: https://github.com/twardoch/twat-mp/compare/v1.8.0...HEAD
-[1.8.0]: https://github.com/twardoch/twat-mp/compare/v1.7.5...v1.8.0
+[Unreleased]: https://github.com/twardoch/twat-mp/compare/v2.5.3...HEAD
+[2.5.3]: https://github.com/twardoch/twat-mp/compare/v2.0.0...v2.5.3
+[2.0.0]: https://github.com/twardoch/twat-mp/compare/v1.7.5...v2.0.0
 [1.7.5]: https://github.com/twardoch/twat-mp/compare/v1.7.3...v1.7.5
 // ... existing references ...
