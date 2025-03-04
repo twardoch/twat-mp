@@ -6,26 +6,13 @@ this_file: TODO.md
 
 Tip: Periodically run `python ./cleanup.py status` to see results of lints and tests. Use `uv pip ...` not `pip ...`
 
+## Phase 0
+
+- [ ] Adapt tests to new naming
 
 ## Phase 1
 
-- [x] Add proper docstrings to all public functions and classes
-- [x] Improve error handling in AsyncMultiPool.__aexit__ for better resource cleanup
-- [x] Add more comprehensive unit tests for edge cases
-- [x] Enhance exception propagation from worker processes
-- [x] Implement debug mode with detailed logging
-- [x] Add more real-world examples in documentation
-
-## Phase 2
-
-- [x] Implement consistent error handling across all modules
-- [x] Refactor code to reduce duplication between mp.py and async_mp.py
-- [x] Add more assertions and runtime checks for better error messages
-- [x] Standardize naming conventions across the codebase
-- [x] Add comprehensive documentation for error handling strategies
-- [x] Improve exception propagation from worker processes to main process
-
-## Phase 3
+- [ ] Add a CLI interface for common operations
 
 - [ ] Add support for cancellation of running tasks
 - [ ] Implement progress tracking for long-running parallel operations
@@ -37,10 +24,9 @@ Tip: Periodically run `python ./cleanup.py status` to see results of lints and t
 - [ ] Implement adaptive pool sizing based on workload and system resources
 - [ ] Add support for task prioritization and scheduling
 
-## Testing and Reliability
+## Phase 2
 
 - [ ] Increase test coverage to at least 90%
-- [x] Add more edge case tests for error conditions
 - [ ] Implement stress tests for high concurrency scenarios
 - [ ] Add tests for resource leaks and memory usage
 - [ ] Add tests for different Python versions and platforms
@@ -48,7 +34,7 @@ Tip: Periodically run `python ./cleanup.py status` to see results of lints and t
 - [ ] Add tests for keyboard interrupt handling during execution
 - [ ] Implement regression tests for fixed bugs
 
-## Performance Optimizations
+## Phase 3
 
 - [ ] Optimize serialization/deserialization for better performance
 - [ ] Optimize memory usage for large datasets
@@ -57,7 +43,7 @@ Tip: Periodically run `python ./cleanup.py status` to see results of lints and t
 - [ ] Add performance comparison with native multiprocessing
 - [ ] Implement workload-specific optimization strategies
 
-## Compatibility and Integration
+## Phase 4
 
 - [ ] Implement compatibility with other multiprocessing libraries
 - [ ] Add support for distributed processing across multiple machines
@@ -68,7 +54,6 @@ Tip: Periodically run `python ./cleanup.py status` to see results of lints and t
 
 ## User Experience
 
-- [ ] Add a CLI interface for common operations
 - [ ] Implement automatic pool selection based on workload characteristics
 - [ ] Add progress bars and status reporting for long-running tasks
 - [ ] Add more intuitive error recovery suggestions
