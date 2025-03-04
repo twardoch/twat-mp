@@ -2,7 +2,7 @@
 description: File tree of the project
 globs: 
 ---
-[ 896]  .
+[ 928]  .
 ├── [  96]  .cursor
 │   └── [ 224]  rules
 │       ├── [ 821]  0project.mdc
@@ -28,11 +28,12 @@ globs:
 ├── [ 288]  .venv
 ├── [6.0K]  API_REFERENCE.md
 ├── [3.8K]  CHANGELOG.md
-├── [ 986]  CLEANUP.txt
+├── [ 939]  CLEANUP.txt
 ├── [1.0K]  LICENSE
+├── [1.3K]  LOG.md
 ├── [ 13K]  README.md
-├── [ 77K]  REPO_CONTENT.txt
-├── [2.9K]  TODO.md
+├── [ 78K]  REPO_CONTENT.txt
+├── [2.2K]  TODO.md
 ├── [   7]  VERSION.txt
 ├── [ 13K]  cleanup.py
 ├── [ 160]  dist
@@ -49,4 +50,4 @@ globs:
     ├── [6.3K]  test_benchmark.py
     └── [ 13K]  test_twat_mp.py
 
-13 directories, 33 files
+13 directories, 34 files
