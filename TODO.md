@@ -4,25 +4,26 @@ this_file: TODO.md
 
 # TODO
 
-Tip: Periodically run `./cleanup.py status` to see results of lints and tests.
+Tip: Periodically run `python ./cleanup.py status` to see results of lints and tests. Use `uv pip ...` not `pip ...`
+
 
 ## Phase 1
 
-- [ ] Add proper docstrings to all public functions and classes
-- [ ] Improve error handling in AsyncMultiPool.__aexit__ for better resource cleanup
-- [ ] Add more comprehensive unit tests for edge cases
-- [ ] Enhance exception propagation from worker processes
-- [ ] Implement debug mode with detailed logging
-- [ ] Add more real-world examples in documentation
+- [x] Add proper docstrings to all public functions and classes
+- [x] Improve error handling in AsyncMultiPool.__aexit__ for better resource cleanup
+- [x] Add more comprehensive unit tests for edge cases
+- [x] Enhance exception propagation from worker processes
+- [x] Implement debug mode with detailed logging
+- [x] Add more real-world examples in documentation
 
 ## Phase 2
 
-- [ ] Implement consistent error handling across all modules
-- [ ] Refactor code to reduce duplication between mp.py and async_mp.py
-- [ ] Add more assertions and runtime checks for better error messages
-- [ ] Standardize naming conventions across the codebase
-- [ ] Add comprehensive documentation for error handling strategies
-- [ ] Improve exception propagation from worker processes to main process
+- [x] Implement consistent error handling across all modules
+- [x] Refactor code to reduce duplication between mp.py and async_mp.py
+- [x] Add more assertions and runtime checks for better error messages
+- [x] Standardize naming conventions across the codebase
+- [x] Add comprehensive documentation for error handling strategies
+- [x] Improve exception propagation from worker processes to main process
 
 ## Phase 3
 

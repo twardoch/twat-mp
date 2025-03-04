@@ -6,19 +6,77 @@
 
 """
 Asynchronous multiprocessing pool implementation using aiomultiprocess.
+
 This module provides a high-level interface for parallel processing with async/await support.
+It allows for efficient execution of CPU-bound tasks within an asynchronous context by
+leveraging multiple processes, each capable of running coroutines independently.
+
+The main components are:
+- AsyncMultiPool: A context manager for managing aiomultiprocess.Pool instances
+- apmap: A decorator for easily applying async functions to iterables in parallel
+
+Example:
+    ```python
+    import asyncio
+    from twat_mp import AsyncMultiPool, apmap
+
+    # Using the context manager directly
+    async def main():
+        async with AsyncMultiPool() as pool:
+            async def work(x):
+                await asyncio.sleep(0.1)  # Simulate I/O or CPU work
+                return x * 2
+
+            results = await pool.map(work, range(10))
+            print(results)  # [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
+
+    # Using the decorator
+    @apmap
+    async def process_item(x):
+        await asyncio.sleep(0.1)
+        return x * 3
+
+    async def main2():
+        results = await process_item(range(5))
+        print(results)  # [0, 3, 6, 9, 12]
+
+    asyncio.run(main())
+    asyncio.run(main2())
+    ```
 """
 
+import logging
+import traceback
 from functools import wraps
-from typing import Any, AsyncIterator, Awaitable, Callable, Iterable, TypeVar, cast
+from typing import (
+    Any,
+    AsyncIterator,
+    Awaitable,
+    Callable,
+    Iterable,
+    TypeVar,
+    Optional,
+)
 
+# Set up logging
+logger = logging.getLogger(__name__)
+
+# Import aiomultiprocess conditionally to handle the case when it's not installed
 HAS_AIOMULTIPROCESS = False
 try:
     import aiomultiprocess
+    from aiomultiprocess import Pool as AioPool
 
     HAS_AIOMULTIPROCESS = True
 except ImportError:
     aiomultiprocess = None
+
+    # Define a placeholder type for type checking
+    class AioPool:  # type: ignore
+        """Placeholder for aiomultiprocess.Pool when not available."""
+
+        pass
+
 
 T = TypeVar("T")
 U = TypeVar("U")
@@ -91,9 +149,9 @@ class AsyncMultiPool:
 
     def __init__(
         self,
-        processes: int | None = None,
-        initializer: Callable[..., Any] | None = None,
-        initargs: tuple[Any, ...] | None = None,
+        processes: Optional[int] = None,
+        initializer: Optional[Callable[..., Any]] = None,
+        initargs: Optional[tuple[Any, ...]] = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -101,9 +159,14 @@ class AsyncMultiPool:
 
         Args:
             processes: Number of processes to use. If None, uses CPU count.
+                       For CPU-bound tasks, setting this to the number of CPU cores
+                       typically provides optimal performance.
             initializer: Optional callable to initialize worker processes.
+                         This is called once for each worker process when it starts.
             initargs: Arguments to pass to the initializer.
+                      Only used if initializer is specified.
             **kwargs: Additional keyword arguments passed to aiomultiprocess.Pool.
+                      See aiomultiprocess documentation for available options.
 
         Raises:
             ImportError: If aiomultiprocess is not installed.
@@ -113,17 +176,36 @@ class AsyncMultiPool:
         self.initializer = initializer
         self.initargs = initargs or ()
         self.kwargs = kwargs
-        self.pool: aiomultiprocess.Pool | None = None
+        self.pool: Optional[AioPool] = None
+        self._cleanup_attempted = False
 
     async def __aenter__(self) -> "AsyncMultiPool":
-        """Enter the async context, creating and starting the pool."""
+        """
+        Enter the async context, creating and starting the pool.
+
+        This method initializes the underlying aiomultiprocess.Pool with the
+        parameters provided during initialization.
+
+        Returns:
+            The AsyncMultiPool instance (self) for method chaining.
+
+        Raises:
+            ImportError: If aiomultiprocess is not installed.
+            RuntimeError: If pool creation fails.
+        """
         _check_aiomultiprocess()
-        self.pool = aiomultiprocess.Pool(
-            self.processes,
-            initializer=self.initializer,
-            initargs=self.initargs,
-            **self.kwargs,
-        )
+        if aiomultiprocess is not None:  # This check is for type checking only
+            try:
+                self.pool = aiomultiprocess.Pool(
+                    self.processes,
+                    initializer=self.initializer,
+                    initargs=self.initargs,
+                    **self.kwargs,
+                )
+                logger.debug(f"Created AsyncMultiPool with {self.processes} processes")
+            except Exception as e:
+                logger.error(f"Failed to create AsyncMultiPool: {e}")
+                raise RuntimeError(f"Failed to create AsyncMultiPool: {e}") from e
         return self
 
     async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
@@ -131,34 +213,75 @@ class AsyncMultiPool:
         Exit the async context, closing and joining the pool.
 
         This method ensures proper cleanup of resources even if an exception occurs.
-        It attempts to gracefully close the pool first, then joins it to wait for
-        all running tasks to complete.
+        It implements a robust cleanup strategy with multiple fallback mechanisms:
+
+        1. First attempts a graceful shutdown with close() and join()
+        2. If that fails, falls back to terminate() and join()
+        3. If all cleanup attempts fail, ensures the pool reference is cleared
+
+        The method also propagates any exceptions that occurred during cleanup
+        if there wasn't already an exception in progress.
 
         Args:
             exc_type: The exception type if an exception was raised.
             exc_val: The exception value if an exception was raised.
             exc_tb: The traceback if an exception was raised.
+
+        Raises:
+            RuntimeError: If an error occurs during pool cleanup and no previous
+                         exception was being handled.
         """
-        if self.pool:
+        if not self.pool:
+            logger.debug("No pool to clean up in __aexit__")
+            return
+
+        # Avoid duplicate cleanup attempts
+        if self._cleanup_attempted:
+            logger.warning("Cleanup already attempted, skipping")
+            return
+
+        self._cleanup_attempted = True
+        cleanup_error = None
+
+        # Log if we're cleaning up due to an exception
+        if exc_type:
+            logger.warning(
+                f"Cleaning up pool after exception: {exc_type.__name__}: {exc_val}"
+            )
+
+        try:
+            # Step 1: Try graceful shutdown first
+            logger.debug("Attempting graceful pool shutdown with close()")
+            self.pool.close()
+            await self.pool.join()
+            logger.debug("Pool gracefully closed and joined")
+        except Exception as e:
+            # Log the error but continue with cleanup
+            cleanup_error = e
+            logger.error(f"Error during graceful pool shutdown: {e}")
+            logger.debug(f"Traceback: {traceback.format_exc()}")
+
             try:
-                # Use close() for graceful shutdown instead of terminate()
-                # This allows running tasks to complete
-                self.pool.close()
+                # Step 2: Fall back to terminate if close fails
+                logger.debug("Attempting forceful pool termination")
+                self.pool.terminate()
                 await self.pool.join()
-            except Exception as e:
-                # If close/join fails, fall back to terminate()
-                try:
-                    self.pool.terminate()
-                    await self.pool.join()
-                except Exception:
-                    # Last resort: just set pool to None and let GC handle it
-                    pass
-                # Log error or handle it appropriately
-                if exc_type is None:
-                    # If no previous exception, raise the cleanup exception
-                    raise RuntimeError(f"Error during pool cleanup: {e}") from e
-            finally:
-                self.pool = None
+                logger.debug("Pool forcefully terminated and joined")
+            except Exception as e2:
+                # Update the cleanup error but continue
+                cleanup_error = e2
+                logger.error(f"Error during forceful pool termination: {e2}")
+                logger.debug(f"Traceback: {traceback.format_exc()}")
+        finally:
+            # Step 3: Always clear the pool reference
+            logger.debug("Clearing pool reference")
+            self.pool = None
+
+        # If we had a cleanup error and no prior exception, raise the cleanup error
+        if cleanup_error and not exc_type:
+            error_msg = f"Error during pool cleanup: {cleanup_error}"
+            logger.error(error_msg)
+            raise RuntimeError(error_msg) from cleanup_error
 
     async def map(
         self, func: Callable[[T], Awaitable[U]], iterable: Iterable[T]
@@ -195,7 +318,12 @@ class AsyncMultiPool:
         _check_aiomultiprocess()
         if not self.pool:
             raise RuntimeError("Pool not initialized. Use 'async with' statement.")
-        return await self.pool.map(func, iterable)
+
+        try:
+            return await self.pool.map(func, iterable)
+        except Exception as e:
+            logger.error(f"Error during parallel map operation: {e}")
+            raise RuntimeError(f"Error during parallel map operation: {e}") from e
 
     async def starmap(
         self,
@@ -239,7 +367,12 @@ class AsyncMultiPool:
         _check_aiomultiprocess()
         if not self.pool:
             raise RuntimeError("Pool not initialized. Use 'async with' statement.")
-        return await self.pool.starmap(func, iterable)
+
+        try:
+            return await self.pool.starmap(func, iterable)
+        except Exception as e:
+            logger.error(f"Error during parallel starmap operation: {e}")
+            raise RuntimeError(f"Error during parallel starmap operation: {e}") from e
 
     async def imap(
         self, func: Callable[[T], Awaitable[U]], iterable: Iterable[T]
@@ -248,8 +381,8 @@ class AsyncMultiPool:
         Async iterator version of map().
 
         This method returns an async iterator that yields results as they become
-        available, which can be more efficient when processing large datasets or
-        when you want to start processing results before all items are complete.
+        available, which can be more memory-efficient for large datasets or when
+        processing times vary significantly between items.
 
         Args:
             func: Async function to apply to each item.
@@ -264,57 +397,60 @@ class AsyncMultiPool:
 
         Example:
             ```python
-            async def process_item(x):
+            async def process(x):
                 await asyncio.sleep(random.random())  # Variable processing time
                 return x * 2
 
             async with AsyncMultiPool() as pool:
-                # Process items and handle results as they arrive
-                async for result in pool.imap(process_item, range(10)):
-                    print(f"Received result: {result}")
-                    # Results may arrive in any order due to variable processing time
+                # Process and handle results as they arrive
+                async for result in pool.imap(process, range(10)):
+                    print(f"Got result: {result}")
             ```
         """
         _check_aiomultiprocess()
         if not self.pool:
             raise RuntimeError("Pool not initialized. Use 'async with' statement.")
-        return cast(AsyncIterator[U], self.pool.imap(func, iterable))
+
+        try:
+            # Use explicit async for loop to yield results
+            async for result in self.pool.imap(func, iterable):
+                yield result
+        except Exception as e:
+            logger.error(f"Error during parallel imap operation: {e}")
+            raise RuntimeError(f"Error during parallel imap operation: {e}") from e
 
 
 def apmap(
     func: Callable[[T], Awaitable[U]],
 ) -> Callable[[Iterable[T]], Awaitable[list[U]]]:
     """
-    Decorator that wraps a function to run it in parallel using AsyncMultiPool.
+    Decorator for parallel processing of async functions.
 
-    This decorator simplifies the common pattern of creating a pool and mapping
-    a function over an iterable. When the decorated function is called with an
-    iterable, it automatically creates an AsyncMultiPool, maps the function over
-    the iterable, and returns the results.
+    This decorator transforms an async function into one that can be applied
+    to each item in an iterable in parallel using an AsyncMultiPool. It handles
+    the creation and cleanup of the pool automatically.
 
     Args:
-        func: Async function to parallelize.
+        func: The async function to parallelize.
 
     Returns:
-        Wrapped function that runs in parallel.
+        A wrapped async function that, when called with an iterable, applies
+        the original function to each item in parallel and returns the results.
 
     Raises:
         ImportError: If aiomultiprocess is not installed.
 
     Example:
         ```python
-        import asyncio
-
-        # Decorate an async function for parallel execution
         @apmap
-        async def double(x):
+        async def process(x):
             await asyncio.sleep(0.1)  # Simulate work
-            return x * 2
+            return x * 3
 
         async def main():
-            # Call the decorated function with an iterable
-            results = await double(range(10))
-            print(results)  # [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
+            # This will process all items in parallel
+            results = await process(range(5))
+            print(results)  # [0, 3, 6, 9, 12]
 
         asyncio.run(main())
         ```
@@ -323,7 +459,27 @@ def apmap(
 
     @wraps(func)
     async def wrapper(iterable: Iterable[T]) -> list[U]:
-        async with AsyncMultiPool() as pool:
-            return await pool.map(func, iterable)
+        """
+        Apply the decorated async function to each item in the iterable in parallel.
+
+        This wrapper function creates an AsyncMultiPool, uses it to apply the
+        decorated function to each item in the iterable, and then cleans up the pool.
+
+        Args:
+            iterable: The items to process.
+
+        Returns:
+            A list of results from applying the function to each item.
+
+        Raises:
+            ImportError: If aiomultiprocess is not installed.
+            RuntimeError: If pool creation or execution fails.
+        """
+        try:
+            async with AsyncMultiPool() as pool:
+                return await pool.map(func, iterable)
+        except Exception as e:
+            logger.error(f"Error in apmap decorator: {e}")
+            raise RuntimeError(f"Error in parallel processing: {e}") from e
 
     return wrapper

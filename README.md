@@ -18,11 +18,17 @@ Parallel processing utilities using Pathos and aiomultiprocess libraries. This p
 * Full type hints and modern Python features
 * Flexible pool configuration with customizable worker count
 * Graceful error handling and resource cleanup
+* Enhanced exception propagation with detailed context
+* Debug mode with comprehensive logging
 * Optional dependencies to reduce installation footprint
 * Version control system (VCS) based versioning using hatch-vcs
 
 ## Recent Updates
 
+* Added debug mode with detailed logging via `set_debug_mode()`
+* Enhanced error handling with `WorkerException` for better context
+* Improved exception propagation from worker processes
+* Added comprehensive docstrings to all public functions and classes
 * Fixed build system configuration with proper version handling
 * Enhanced error handling and resource cleanup
 * Improved compatibility with Python 3.12+ async features
@@ -216,6 +222,60 @@ def io_intensive(x: int) -> int:
 results = list(io_intensive(compute_intensive(range(100))))
 ```
 
+### Debug Mode and Error Handling
+
+The package provides a debug mode for detailed logging and enhanced error handling:
+
+```python
+from twat_mp import ProcessPool, set_debug_mode
+import time
+import random
+
+def process_item(x):
+    """Process an item with random delay and potential errors."""
+    # Simulate random processing time
+    time.sleep(random.random() * 0.5)
+    
+    # Randomly fail for demonstration
+    if random.random() < 0.2:  # 20% chance of failure
+        raise ValueError(f"Random failure processing item {x}")
+        
+    return x * 10
+
+# Enable debug mode for detailed logging
+set_debug_mode(True)
+
+try:
+    with ProcessPool() as pool:
+        results = list(pool.map(process_item, range(10)))
+        print(f"Processed results: {results}")
+except Exception as e:
+    print(f"Caught exception: {e}")
+    # The exception will include details about which worker and input item caused the error
+finally:
+    # Disable debug mode when done
+    set_debug_mode(False)
+```
+
+The enhanced error handling provides detailed context about failures:
+
+```python
+from twat_mp import ProcessPool
+
+def risky_function(x):
+    if x == 5:
+        raise ValueError("Cannot process item 5")
+    return x * 2
+
+try:
+    with ProcessPool() as pool:
+        results = list(pool.map(risky_function, range(10)))
+except ValueError as e:
+    # The exception will include the worker ID and input item that caused the error
+    print(f"Caught error: {e}")
+    # Handle the error appropriately
+```
+
 ## Real-World Examples
 
 ### Image Processing
@@ -253,165 +313,148 @@ with ProcessPool() as pool:
 print(f"Processed {len(results)} images")
 ```
 
-### Data Processing with Pandas
+### Web Scraping
 
-Splitting a large DataFrame into chunks and processing them in parallel:
-
-```python
-from twat_mp import ProcessPool
-import pandas as pd
-import numpy as np
-
-def process_chunk(chunk):
-    """Apply complex transformations to a DataFrame chunk."""
-    # Simulate CPU-intensive calculations
-    chunk['calculated'] = np.sqrt(chunk['value'] ** 2 + chunk['other_value'] ** 2)
-    chunk['category'] = chunk['calculated'].apply(lambda x: 'high' if x > 50 else 'medium' if x > 20 else 'low')
-    return chunk
-
-# Create a large DataFrame
-df = pd.DataFrame({
-    'value': np.random.randint(1, 100, 100000),
-    'other_value': np.random.randint(1, 100, 100000)
-})
-
-# Split into chunks
-chunk_size = 10000
-chunks = [df.iloc[i:i+chunk_size] for i in range(0, len(df), chunk_size)]
-
-# Process chunks in parallel
-with ProcessPool() as pool:
-    processed_chunks = list(pool.map(process_chunk, chunks))
-
-# Combine results
-result_df = pd.concat(processed_chunks)
-print(f"Processed DataFrame with {len(result_df)} rows")
-```
-
-### Web Scraping with Async Support
-
-Using the async capabilities to scrape multiple web pages concurrently:
+Thread pools are ideal for I/O-bound operations like web scraping:
 
 ```python
-import asyncio
-import aiohttp
+import requests
 from bs4 import BeautifulSoup
-from twat_mp import AsyncMultiPool, apmap
-
-async def fetch_page(url):
-    """Fetch a web page and extract its title."""
-    async with aiohttp.ClientSession() as session:
-        try:
-            async with session.get(url, timeout=10) as response:
-                if response.status == 200:
-                    html = await response.text()
-                    soup = BeautifulSoup(html, 'html.parser')
-                    title = soup.title.string if soup.title else "No title found"
-                    return {'url': url, 'title': title, 'status': response.status}
-                else:
-                    return {'url': url, 'error': f'Status code: {response.status}', 'status': response.status}
-        except Exception as e:
-            return {'url': url, 'error': str(e), 'status': None}
-
-# Use the decorator for parallel processing
-@apmap
-async def fetch_all_pages(url):
-    return await fetch_page(url)
-
-async def main():
-    # List of URLs to scrape
-    urls = [
-        'https://python.org',
-        'https://github.com',
-        'https://stackoverflow.com',
-        'https://news.ycombinator.com',
-        'https://reddit.com'
-    ]
-
-    # Fetch all pages in parallel
-    results = await fetch_all_pages(urls)
-
-    # Print results
-    for result in results:
-        if 'error' in result:
-            print(f"Error fetching {result['url']}: {result['error']}")
-        else:
-            print(f"Title of {result['url']}: {result['title']}")
-
-if __name__ == "__main__":
-    asyncio.run(main())
-```
-
-### File System Operations
-
-Processing files in a directory structure:
-
-```python
 from twat_mp import ThreadPool
-import os
-import hashlib
 
-def calculate_file_hash(file_path):
-    """Calculate SHA-256 hash of a file."""
-    if not os.path.isfile(file_path):
-        return (file_path, None, "Not a file")
-
+def fetch_page_title(url):
+    """Fetch the title of a webpage."""
     try:
-        hasher = hashlib.sha256()
-        with open(file_path, 'rb') as f:
-            # Read in chunks to handle large files
-            for chunk in iter(lambda: f.read(4096), b''):
-                hasher.update(chunk)
-        return (file_path, hasher.hexdigest(), None)
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, 'html.parser')
+        title = soup.title.string if soup.title else "No title found"
+        return {"url": url, "title": title, "status": response.status_code}
     except Exception as e:
-        return (file_path, None, str(e))
+        return {"url": url, "error": str(e), "status": None}
 
-def find_files(directory):
-    """Recursively find all files in a directory."""
-    file_paths = []
-    for root, _, files in os.walk(directory):
-        for file in files:
-            file_paths.append(os.path.join(root, file))
-    return file_paths
-
-# Get all files in a directory
-files = find_files('/path/to/directory')
+# List of URLs to scrape
+urls = [
+    "https://www.python.org",
+    "https://www.github.com",
+    "https://www.stackoverflow.com",
+    "https://www.wikipedia.org",
+    "https://www.reddit.com"
+]
 
 # Use ThreadPool for I/O-bound operations
 with ThreadPool() as pool:
-    results = list(pool.map(calculate_file_hash, files))
+    results = list(pool.map(fetch_page_title, urls))
 
-# Process results
-for file_path, file_hash, error in results:
-    if error:
-        print(f"Error processing {file_path}: {error}")
+# Print results
+for result in results:
+    if "error" in result:
+        print(f"Error fetching {result['url']}: {result['error']}")
     else:
-        print(f"{file_path}: {file_hash}")
-
-## Dependencies
-
-* `pathos`: For process and thread-based parallel processing
-* `aiomultiprocess` (optional): For async-based parallel processing
-
-## Development
-
-To set up the development environment:
-
-```bash
-# Install in development mode with test dependencies
-uv pip install -e ".[test]"
-
-# Install with async support for testing all features
-uv pip install -e ".[aio,test]"
-
-# Run tests
-python -m pytest tests/
-
-# Run benchmarks
-python -m pytest tests/test_benchmark.py
+        print(f"{result['url']} - {result['title']} (Status: {result['status']})")
 ```
+
+### Data Processing with Pandas
+
+Process large datasets in parallel chunks:
+
+```python
+import pandas as pd
+import numpy as np
+from twat_mp import ProcessPool
+
+def process_chunk(chunk_data):
+    """Process a chunk of data."""
+    # Simulate some data processing
+    chunk_data['processed'] = chunk_data['value'] * 2 + np.random.randn(len(chunk_data))
+    chunk_data['category'] = pd.cut(chunk_data['processed'], 
+                                    bins=[-np.inf, 0, 10, np.inf], 
+                                    labels=['low', 'medium', 'high'])
+    # Calculate some statistics
+    result = {
+        'chunk_id': chunk_data['chunk_id'].iloc[0],
+        'mean': chunk_data['processed'].mean(),
+        'median': chunk_data['processed'].median(),
+        'std': chunk_data['processed'].std(),
+        'count': len(chunk_data),
+        'categories': chunk_data['category'].value_counts().to_dict()
+    }
+    return result
+
+# Create a large DataFrame
+n_rows = 1_000_000
+df = pd.DataFrame({
+    'value': np.random.randn(n_rows),
+    'group': np.random.choice(['A', 'B', 'C', 'D'], n_rows)
+})
+
+# Split into chunks for parallel processing
+chunk_size = 100_000
+chunks = []
+for i, chunk_start in enumerate(range(0, n_rows, chunk_size)):
+    chunk_end = min(chunk_start + chunk_size, n_rows)
+    chunk = df.iloc[chunk_start:chunk_end].copy()
+    chunk['chunk_id'] = i
+    chunks.append(chunk)
+
+# Process chunks in parallel
+with ProcessPool() as pool:
+    results = list(pool.map(process_chunk, chunks))
+
+# Combine results
+summary = pd.DataFrame(results)
+print(summary)
+```
+
+### Async File Processing
+
+Combine async I/O with parallel processing:
+
+```python
+import asyncio
+import aiofiles
+import os
+from twat_mp import AsyncMultiPool
+
+async def count_words(filename):
+    """Count words in a file asynchronously."""
+    try:
+        async with aiofiles.open(filename, 'r') as f:
+            content = await f.read()
+            word_count = len(content.split())
+            return {"filename": filename, "word_count": word_count}
+    except Exception as e:
+        return {"filename": filename, "error": str(e)}
+
+async def main():
+    # Get all text files in a directory
+    files = [os.path.join("documents", f) for f in os.listdir("documents") 
+             if f.endswith(".txt")]
+    
+    # Process files in parallel
+    async with AsyncMultiPool() as pool:
+        results = await pool.map(count_words, files)
+    
+    # Calculate total word count
+    total_words = sum(r.get("word_count", 0) for r in results)
+    
+    # Print results
+    for result in results:
+        if "error" in result:
+            print(f"Error processing {result['filename']}: {result['error']}")
+        else:
+            print(f"{result['filename']}: {result['word_count']} words")
+    
+    print(f"Total word count: {total_words}")
+
+# Run the async main function
+asyncio.run(main())
+```
+
+## API Reference
+
+For detailed API documentation, see the [API Reference](API_REFERENCE.md).
 
 ## License
 
-MIT License
-.
+MIT
