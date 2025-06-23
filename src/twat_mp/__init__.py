@@ -12,7 +12,9 @@ from twat_mp.mp import (
     pmap,
     set_debug_mode,
 )
-from twat_mp.async_mp import AsyncMultiPool, apmap
+
+# TODO: MVP Isolation - Async features temporarily disabled due to test environment hangs.
+# from twat_mp.async_mp import AsyncMultiPool, apmap
 
 try:
     from twat_mp.__version__ import __version__
@@ -21,13 +23,13 @@ except ImportError:
 
 
 __all__ = [
-    "AsyncMultiPool",
+    # "AsyncMultiPool", # Temporarily disabled for MVP
     "MultiPool",
     "ProcessPool",
     "ThreadPool",
     "__version__",
     "amap",
-    "apmap",
+    # "apmap",          # Temporarily disabled for MVP
     "imap",
     "mmap",
     "pmap",
