@@ -60,9 +60,16 @@ class WorkerError(Exception):
 
     Attributes:
         original_exception: The original exception raised in the worker process.
-        worker_id: The ID of the worker process where the error occurred, if available.
+        worker_id: An identifier for the worker/task where the error occurred.
+                   This is typically an index or similar context provided by the
+                   mapping function, not necessarily a persistent OS process/thread ID.
+                   May be `None` if not available.
         input_item: The input item that was being processed when the error occurred.
         traceback_str: The traceback string from the worker process, if available.
+
+    Example of a typical error message string:
+        "Worker process error while processing 'some_input': ValueError: Specific error details"
+        "Worker process error in worker 1 while processing 'other_input': TypeError: Another issue"
     """
 
     def __init__(
@@ -141,7 +148,8 @@ def _worker_wrapper(func: Callable[[T], U], item: T, worker_id: int | None = Non
     Args:
         func: The worker function to execute.
         item: The input item to process.
-        worker_id: An optional identifier for the worker process.
+        worker_id: An optional identifier for the worker context (e.g., an item index
+                   passed by the mapping infrastructure). Not necessarily an OS thread/process ID.
 
     Returns:
         The result of applying the function to the item.
@@ -199,12 +207,14 @@ class MultiPool:
         Initialize the MultiPool context manager.
 
         Args:
-            pool_class: The pool class to use (ProcessPool or ThreadPool).
-                       Defaults to ProcessPool.
-            nodes: The number of processes/threads to create.
-                  If None, uses the CPU count.
-            debug: Whether to enable debug mode for this pool instance.
-                  If None, uses the global DEBUG_MODE setting.
+            pool_class: The pool class to use (e.g., `pathos.pools.ProcessPool`
+                       or `pathos.pools.ThreadPool`). Defaults to `ProcessPool`.
+            nodes: The number of worker processes or threads to create.
+                   If `None`, defaults to the system's CPU count.
+                   For I/O-bound tasks with `ThreadPool`, values greater than CPU
+                   count might be beneficial.
+            debug: Whether to enable debug mode for this specific pool instance.
+                   If `None`, inherits the global `DEBUG_MODE` setting.
         """
         self.pool_class = pool_class
         # If nodes is not specified, determine optimal number based on CPU count.
@@ -222,11 +232,15 @@ class MultiPool:
         """
         Enter the runtime context and create the pool.
 
+        The pool's `map` method is patched during this step to use an enhanced
+        wrapper (`_worker_wrapper`) that provides more detailed `WorkerError`
+        exceptions, including the input item that caused the error.
+
         Returns:
-            The instantiated pool object.
+            The instantiated pool object (e.g., a Pathos `ProcessPool` or `ThreadPool`).
 
         Raises:
-            RuntimeError: If pool creation fails.
+            RuntimeError: If pool creation fails for any reason.
         """
         if self.debug:
             logger.debug(f"Creating pool with {self.nodes} nodes")
@@ -426,28 +440,47 @@ def mmap(
     """
     Create a decorator to perform parallel mapping using a specified Pathos pool method.
 
-    The decorator wraps a function so that when it is called with an iterable,
-    the function is applied in parallel using the specified mapping method.
-    For asynchronous mapping (e.g., 'amap'), the result's `.get()` method can be
-    automatically called to retrieve the computed values.
+    The decorator wraps a function, causing it to execute in parallel when called
+    with an iterable. It uses a `MultiPool` context internally.
+
+    Error Handling:
+        - If the wrapped function raises an exception in a worker, and this exception
+          is captured by `_worker_wrapper` (producing a `WorkerError`), `mmap` will
+          attempt to re-raise the `original_exception` from the `WorkerError`.
+          This means your original exception (e.g., `ValueError`, `TypeError` from
+          your function) will propagate out of the decorated function call.
+        - If `WorkerError` is raised but has no `original_exception` (uncommon),
+          the `WorkerError` itself is raised.
+        - Other errors, such as issues with pool creation, invalid mapping methods,
+          or unexpected errors from Pathos internals during the map call, are
+          wrapped in a `RuntimeError`.
+        - `KeyboardInterrupt` is propagated to allow for user interruption.
 
     Args:
-        how: Name of the pool mapping method ('map', 'imap', or 'amap').
-             - 'map': Standard parallel mapping, returns results in order
-             - 'imap': Iterative mapping, returns results as they complete
-             - 'amap': Asynchronous mapping, returns a future-like object
-        get_result: If True, automatically call .get() on the result (useful for amap).
-                    Defaults to False.
+        how: The name of the Pathos pool mapping method to use. Must be one of
+             'map' (standard, eager evaluation), 'imap' (lazy, returns iterator),
+             or 'amap' (asynchronous, returns a future-like object).
+        get_result: If `True` and `how` is 'amap', automatically calls `.get()`
+                    on the asynchronous result to retrieve computed values.
+                    Defaults to `False`.
         debug: Whether to enable debug mode for operations using this decorator.
-              If None, uses the global DEBUG_MODE setting.
+               If `None`, inherits the global `DEBUG_MODE` setting.
 
     Returns:
-        A decorator function that transforms the target function for parallel execution.
+        A decorator that transforms the target function for parallel execution.
+        The decorated function will accept an iterable as its first argument,
+        followed by any other arguments `*args` and `**kwargs` which are
+        passed through to the underlying pool's map call if supported by Pathos
+        (though typically map functions primarily use the iterable).
 
     Raises:
-        ValueError: If the specified mapping method is not supported.
-        RuntimeError: If pool creation fails.
-        KeyboardInterrupt: If the user interrupts the execution.
+        ValueError: If `how` specifies an unsupported mapping method.
+        RuntimeError: For issues like pool creation failure or other unexpected
+                      errors during parallel execution.
+        Exception: Propagates the original exception from the worker if a `WorkerError`
+                   with an `original_exception` occurs.
+        KeyboardInterrupt: If the user interrupts execution.
+
 
     Example:
         >>> @mmap('map')
@@ -506,40 +539,29 @@ def mmap(
                             logger.debug("Parallel execution completed successfully")
                         return result
                     except WorkerError as e:
-                        # Handle WorkerError specially
-                        try:
-                            # If it's a WorkerError, extract and re-raise the original exception
-                            # if available, otherwise re-raise the WorkerError itself
-                            if (
-                                isinstance(e, WorkerError)
-                                and e.original_exception is not None
-                            ):
-                                if use_debug:
-                                    logger.debug(
-                                        f"Re-raising original exception from worker: {e.original_exception}"
-                                    )
-                                raise e.original_exception from e
-                            else:
-                                # If no original exception, raise the WorkerError itself
-                                raise
-                        except Exception as e:
-                            # Provide more context for general errors
-                            error_msg = f"Failed to handle WorkerError: {e}"
-                            logger.error(error_msg)
-                            if use_debug:
-                                logger.debug(f"Traceback: {traceback.format_exc()}")
-                            raise RuntimeError(error_msg) from e
+                        # If it's a WorkerError and has an original exception, re-raise that directly.
+                        if use_debug:
+                            logger.debug(
+                                f"WorkerError caught. Original: {e.original_exception}, Input: {e.input_item}, WorkerID: {e.worker_id}"
+                            )
+                        if e.original_exception is not None:
+                            raise e.original_exception from e
+                        else:
+                            # If WorkerError has no original_exception (should be rare), raise WorkerError itself.
+                            raise
                     except KeyboardInterrupt:
                         # Re-raise KeyboardInterrupt to allow proper cleanup
                         if use_debug:
                             logger.debug("KeyboardInterrupt detected during execution")
                         raise
-                    except Exception as e:
-                        # Provide more context for general errors
+                    except Exception as e: # Catches other errors (e.g., from Pathos internal, bad map args)
+                        # Provide more context for general errors not originating from _worker_wrapper
                         error_msg = f"Failed to execute parallel operation: {e}"
                         logger.error(error_msg)
                         if use_debug:
                             logger.debug(f"Traceback: {traceback.format_exc()}")
+                        # It's important to distinguish this from WorkerError.
+                        # This could be an error in Pathos itself, or argument issues to map.
                         raise RuntimeError(error_msg) from e
             except KeyboardInterrupt:
                 if use_debug:
@@ -564,16 +586,20 @@ def pmap(func: Callable[[T], U]) -> Callable[[Iterator[T]], Iterator[U]]:
     """
     Decorator for parallel mapping using a process pool.
 
-    This is a convenience wrapper around mmap('map') that applies the decorated
-    function to each item in the input iterable in parallel using a process pool.
-    It's optimized for CPU-bound operations that benefit from bypassing the GIL.
+    Decorator for parallel mapping using a process pool (via `mmap('map')`).
+
+    Applies the decorated function to each item in an input iterable in parallel.
+    This version uses eager evaluation, collecting all results before returning.
+    It is generally suitable for CPU-bound operations.
+    Error propagation is handled as described in `mmap`.
 
     Args:
-        func: The function to parallelize.
+        func: The function to be parallelized. It should accept a single item
+              from the iterable as input.
 
     Returns:
-        A wrapped function that, when called with an iterable, applies the original
-        function to each item in parallel and returns the results.
+        A wrapped function. When this wrapped function is called with an iterable,
+        it executes the original function in parallel and returns a list of results.
 
     Example:
         >>> @pmap
@@ -591,18 +617,22 @@ def imap(func: Callable[[T], U]) -> Callable[[Iterator[T]], Iterator[U]]:
     """
     Decorator for iterative parallel mapping using a process pool.
 
-    This is a convenience wrapper around mmap('imap') that applies the decorated
-    function to each item in the input iterable in parallel using a process pool,
-    but returns results as they become available rather than waiting for all to complete.
-    This can be more memory-efficient for large datasets as it doesn't need to store
-    all results in memory at once.
+    Decorator for iterative parallel mapping using a process pool (via `mmap('imap')`).
+
+    Applies the decorated function to each item in an input iterable in parallel,
+    returning an iterator that yields results as they become available.
+    This is memory-efficient for large datasets as results are not stored all at once.
+    Error propagation is handled as described in `mmap`. An error might not be
+    raised until the iterator is consumed up to the point of the failing task.
 
     Args:
-        func: The function to parallelize.
+        func: The function to be parallelized. It should accept a single item
+              from the iterable as input.
 
     Returns:
-        A wrapped function that, when called with an iterable, applies the original
-        function to each item in parallel and returns an iterator of results.
+        A wrapped function. When this wrapped function is called with an iterable,
+        it executes the original function in parallel and returns an iterator
+        yielding the results.
 
     Example:
         >>> @imap
@@ -624,20 +654,22 @@ def amap(func: Callable[[T], U]) -> Callable[[Iterator[T]], Any]:
     """
     Decorator for asynchronous parallel mapping using a process pool.
 
-    This is a convenience wrapper around mmap('amap', get_result=True) that applies
-    the decorated function to each item in the input iterable in parallel using a
-    process pool, and returns a future-like object. The results are automatically
-    retrieved by calling .get() on the future.
+    Decorator for asynchronous-style parallel mapping (via `mmap('amap', get_result=True)`).
 
-    This is useful when you want to start a computation and then do other work
-    before collecting the results.
+    Applies the decorated function to each item in an input iterable in parallel.
+    Pathos's 'amap' returns a future-like object; this decorator automatically
+    calls `.get()` on that result, so the wrapped function returns the computed
+    results directly once all are complete.
+    Error propagation is handled as described in `mmap`.
 
     Args:
-        func: The function to parallelize.
+        func: The function to be parallelized. It should accept a single item
+              from the iterable as input.
 
     Returns:
-        A wrapped function that, when called with an iterable, applies the original
-        function to each item in parallel and returns the results.
+        A wrapped function. When this wrapped function is called with an iterable,
+        it executes the original function in parallel and returns a list of results
+        (after implicitly waiting for all tasks to complete).
 
     Example:
         >>> @amap

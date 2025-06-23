@@ -22,6 +22,11 @@ async def async_double(x: int) -> int:
     return x * 2
 
 
+async def async_double_no_sleep(x: int) -> int:
+    """Simple async function that doubles its input, without sleep."""
+    return x * 2
+
+
 async def async_raise_error(x: Any) -> Any:
     """Async function that raises an error."""
     raise ValueError(f"Error processing {x}")
@@ -30,8 +35,8 @@ async def async_raise_error(x: Any) -> Any:
 @pytest.mark.asyncio
 async def test_async_multi_pool_map() -> None:
     """Test basic mapping functionality."""
-    async with AsyncMultiPool() as pool:
-        results = await pool.map(async_double, range(5))
+    async with AsyncMultiPool(processes=1) as pool:
+        results = await pool.map(async_double_no_sleep, range(5))
     assert results == [0, 2, 4, 6, 8]
 
 

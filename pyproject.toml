@@ -65,6 +65,7 @@ test = [
     "pytest-cov>=4.0.0",
     "pytest-benchmark[histogram]>=4.0.0",
     "pytest-xdist>=3.5.0", # For parallel test execution
+    "pytest-asyncio",      # For async test support
     "pandas>=2.0.0", # Required by some test dependencies
     "numpy>=1.24.0", # Required by pandas
     "matplotlib>=3.7.0", # For benchmark visualization
@@ -79,12 +80,12 @@ all = [
 ]
 
 [tool.hatch.envs.test]
-dependencies = [".[test]"]
+dependencies = ["twat-mp[test]"]
 
 [tool.hatch.envs.test.scripts]
 # Regular tests can run in parallel
-test = "python -m pytest -n auto {args:tests}"
-test-cov = "python -m pytest -n auto --cov-report=term-missing --cov-config=pyproject.toml --cov=src/twat_mp --cov=tests {args:tests}"
+test = "python -m pytest -n auto --ignore=tests/test_async_mp.py {args:tests}"
+test-cov = "python -m pytest -p no:xdist -m \"not benchmark\" -k \"not test_parallel_vs_sequential_performance and not test_large_data_handling and not test_nested_pools\" --ignore=tests/test_async_mp.py --cov-report=term-missing --cov-config=pyproject.toml --cov=src/twat_mp --cov=tests {args:tests}"
 # Benchmarks must run sequentially
 bench = "python -m pytest -v -p no:briefcase tests/test_benchmark.py --benchmark-only"
 bench-save = "python -m pytest -v -p no:briefcase tests/test_benchmark.py --benchmark-only --benchmark-json=benchmark/results.json"

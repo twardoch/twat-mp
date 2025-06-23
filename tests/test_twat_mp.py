@@ -5,8 +5,7 @@ from typing import TypeVar, List
 from unittest.mock import patch, MagicMock
 
 import pytest
-from twat_mp import ProcessPool, ThreadPool, amap, imap, mmap, pmap, set_debug_mode
-from twat_mp.__version__ import version as __version__
+from twat_mp import ProcessPool, ThreadPool, amap, imap, mmap, pmap, set_debug_mode, __version__
 from twat_mp.mp import WorkerError
 
 T = TypeVar("T")
@@ -414,22 +413,32 @@ def test_custom_exception_handling():
             raise CustomError(f"Value {x} is too large")
         return x
 
-    # Test with ProcessPool - now expecting WorkerError
-    with pytest.raises(WorkerError) as excinfo:
+    # Test with ProcessPool - expecting WorkerError
+    with pytest.raises(WorkerError) as excinfo_pe:
         with ProcessPool() as pool:
             list(pool.map(raise_custom_error, iter(range(5))))
 
-    # Verify the error information is in the WorkerError
-    assert "CustomError" in str(excinfo.value)
-    assert "Value 3 is too large" in str(excinfo.value)
-    assert "3" in str(excinfo.value)  # Check that the input item is mentioned
+    # Verify the WorkerError details
+    assert isinstance(excinfo_pe.value.original_exception, CustomError)
+    # Check that the input item reported in the WorkerError message
+    # corresponds to the value in the original CustomError message.
+    processed_item_str = str(excinfo_pe.value.input_item)
+    expected_custom_error_msg_part = f"Value {processed_item_str} is too large"
 
-    # Test with decorator - should re-raise the original exception
+    assert expected_custom_error_msg_part in str(excinfo_pe.value.original_exception)
+    assert f"while processing {processed_item_str}" in str(excinfo_pe.value)
+    assert excinfo_pe.value.input_item in (3, 4) # The failing item must be one of these
+
+    # Test with decorator - pmap should re-raise the original CustomError
     @pmap
     def decorated_error_func(x: int) -> int:
         if x > 2:
             raise CustomError(f"Decorated value {x} is too large")
         return x
 
-    with pytest.raises(RuntimeError, match="Failed to create or use pool"):
+    with pytest.raises(CustomError) as excinfo_decorator:
         list(decorated_error_func(iter(range(5))))
+
+    # Pathos map usually raises the first exception encountered.
+    # The failing input items are 3 and 4. The first one is 3.
+    assert "Decorated value 3 is too large" in str(excinfo_decorator.value)
