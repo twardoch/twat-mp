@@ -1,21 +1,22 @@
 # twat-mp
 
-Parallel processing utilities using Pathos and aiomultiprocess libraries. This package provides convenient context managers and decorators for parallel processing, with process-based, thread-based, and async-based pools.
+Parallel processing utilities primarily using the Pathos library for robust synchronous operations. This package provides convenient context managers and decorators for process-based and thread-based parallelism. Support for asynchronous multiprocessing via `aiomultiprocess` is included but considered experimental for the current MVP and will be stabilized in future releases.
 
 ## Features
 
-* Multiple parallel processing options:
-  + `ProcessPool`: For CPU-intensive parallel processing using Pathos
-  + `ThreadPool`: For I/O-bound parallel processing using Pathos
-  + `AsyncMultiPool`: For combined async/await with multiprocessing using aiomultiprocess
-* Decorators for common parallel mapping operations:
-  + `pmap`: Standard parallel map (eager evaluation)
-  + `imap`: Lazy parallel map returning an iterator
-  + `amap`: Asynchronous map with automatic result retrieval
-  + `apmap`: Async parallel map for use with async/await functions
-* Automatic CPU core detection for optimal pool sizing
-* Clean resource management with context managers
-* Full type hints and modern Python features
+* Core parallel processing options using Pathos:
+  + `ProcessPool`: For CPU-intensive parallel processing.
+  + `ThreadPool`: For I/O-bound parallel processing.
+* Decorators for common synchronous parallel mapping operations:
+  + `pmap`: Standard parallel map (eager evaluation).
+  + `imap`: Lazy parallel map returning an iterator.
+  + `amap`: Asynchronous-style map with automatic result retrieval (uses synchronous Pathos pools).
+* Experimental Asynchronous Support (via `aiomultiprocess` - subject to stabilization):
+  + `AsyncMultiPool`: For combined async/await with multiprocessing. (*Experimental*)
+  + `apmap`: Async parallel map for use with async/await functions. (*Experimental*)
+* Automatic CPU core detection for optimal pool sizing.
+* Clean resource management with context managers.
+* Full type hints and modern Python features.
 * Flexible pool configuration with customizable worker count
 * Graceful error handling and resource cleanup
 * Enhanced exception propagation with detailed context
@@ -26,23 +27,22 @@ Parallel processing utilities using Pathos and aiomultiprocess libraries. This p
 ## Recent Updates
 
 * Added debug mode with detailed logging via `set_debug_mode()`
-* Enhanced error handling with `WorkerException` for better context
-* Improved exception propagation from worker processes
-* Added comprehensive docstrings to all public functions and classes
-* Fixed build system configuration with proper version handling
-* Enhanced error handling and resource cleanup
-* Improved compatibility with Python 3.12+ async features
-* Added comprehensive API reference documentation
-* Added real-world examples for various use cases
+* Enhanced error handling with `WorkerError` (previously `WorkerException`) for better context.
+* Improved exception propagation from worker processes.
+* Added comprehensive docstrings to all public functions and classes.
+* Fixed build system configuration with proper version handling.
+* Enhanced error handling and resource cleanup.
+* Added comprehensive API reference documentation.
+* Added real-world examples for various use cases.
 
 ## Installation
 
-Basic installation:
+Core (Synchronous) Installation:
 ```bash
 pip install twat-mp
 ```
 
-With async support:
+To include experimental async support (requires `aiomultiprocess`):
 ```bash
 pip install 'twat-mp[aio]'
 ```
@@ -54,7 +54,7 @@ pip install 'twat-mp[all,dev]'
 
 ## Usage
 
-### Basic Usage
+### Basic Synchronous Usage
 
 ```python
 from twat_mp import ProcessPool, pmap
@@ -62,26 +62,34 @@ from twat_mp import ProcessPool, pmap
 # Using the pool directly
 with ProcessPool() as pool:
     results = pool.map(lambda x: x * 2, range(10))
+    print(list(results))
 
 # Using the decorator
 @pmap
 def double(x):
     return x * 2
 
-results = double(range(10))
+results = list(double(range(10)))
+print(results)
 ```
 
-### Async Support
+### Async Support (Experimental - For Future Stabilization)
 
-The package provides async support through `aiomultiprocess`, allowing you to combine the benefits of async/await with multiprocessing:
+**Note:** Async features are currently considered experimental due to potential environment-specific stability issues (e.g., test hangs). They are provided for early adopters and will be a focus for stabilization in future releases.
+
+The package includes experimental async support through `aiomultiprocess`, allowing you to combine the benefits of async/await with multiprocessing:
 
 ```python
 import asyncio
-from twat_mp import AsyncMultiPool, apmap
+from twat_mp import AsyncMultiPool, apmap # Ensure 'aio' extra is installed
 
 # Using the pool directly
-async def process_items():
-    async with AsyncMultiPool() as pool:
+async def process_items_async():
+    # Note: Ensure AsyncMultiPool and apmap are imported if 'aio' extra is installed
+    # and you intend to use these experimental features.
+    # from twat_mp import AsyncMultiPool, apmap
+
+    async with AsyncMultiPool() as pool: # Experimental
         async def work(x):
             await asyncio.sleep(0.1)  # Some async work
             return x * 2
@@ -90,63 +98,74 @@ async def process_items():
         return results
 
 # Using the decorator
-@apmap
-async def double(x):
+@apmap # Experimental
+async def double_async(x):
     await asyncio.sleep(0.1)  # Some async work
     return x * 2
 
-async def main():
-    results = await double(range(10))
-    print(results)  # [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
+async def main_async_example():
+    # results_items = await process_items_async()
+    # print(f"Async items processed: {results_items}")
 
-asyncio.run(main())
+    results_decorated = await double_async(range(10))
+    print(f"Async decorated results: {results_decorated}") # [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
+
+# if __name__ == "__main__":
+# import asyncio
+# asyncio.run(main_async_example())
 ```
 
-The async support is particularly useful when you need to:
-- Perform CPU-intensive tasks in parallel
-- Handle many concurrent I/O operations
-- Combine async/await with true multiprocessing
-- Process results from async APIs in parallel
+Async support can be useful for:
+- Performing CPU-intensive tasks in parallel within an async application.
+- Handling many concurrent I/O operations when combined with async patterns.
+- Processing results from async APIs in parallel.
 
-### Advanced Async Features
+### Advanced Async Features (Experimental)
 
-The `AsyncMultiPool` provides additional methods for different mapping strategies:
+The `AsyncMultiPool` (experimental) provides additional methods for different mapping strategies:
 
 ```python
 import asyncio
-from twat_mp import AsyncMultiPool
+# from twat_mp import AsyncMultiPool # Ensure 'aio' extra
 
-async def main():
+async def main_advanced_async():
+    # Note: Ensure AsyncMultiPool is imported if 'aio' extra is installed
+    # and you intend to use these experimental features.
+    from twat_mp import AsyncMultiPool
+
     # Using starmap for unpacking arguments
     async def sum_values(a, b):
         await asyncio.sleep(0.01)
         return a + b
 
-    async with AsyncMultiPool() as pool:
+    async with AsyncMultiPool() as pool: # Experimental
         # Regular map
         double_results = await pool.map(
             lambda x: x * 2,
             range(5)
         )
-        print(double_results)  # [0, 2, 4, 6, 8]
+        print(f"Async map results: {double_results}")  # [0, 2, 4, 6, 8]
 
         # Starmap unpacks arguments
         sum_results = await pool.starmap(
             sum_values,
             [(1, 2), (3, 4), (5, 6)]
         )
-        print(sum_results)  # [3, 7, 11]
+        print(f"Async starmap results: {sum_results}")  # [3, 7, 11]
 
         # imap returns an async iterator
-        async for result in pool.imap(sum_values, [(1, 1), (2, 2), (3, 3)]):
-            print(result)  # Prints 2, 4, 6 as they complete
+        print("Async imap results:")
+        async for result in pool.imap(lambda x: x*x, range(3)): # Example with a simple lambda
+            print(result)  # Prints 0, 1, 4 as they complete
 
-asyncio.run(main())
+# if __name__ == "__main__":
+# import asyncio
+# asyncio.run(main_advanced_async())
 ```
 
-### Using Process and Thread Pools
+### Using Process and Thread Pools (Core MVP Feature)
 
-The package provides dedicated context managers for both process and thread pools:
+The package provides dedicated context managers for robust synchronous parallel processing:
 
 ```python
 from twat_mp import ProcessPool, ThreadPool
@@ -154,24 +173,25 @@ from twat_mp import ProcessPool, ThreadPool
 # For CPU-intensive operations
 with ProcessPool() as pool:
     results = pool.map(lambda x: x * x, range(10))
-    print(list(results))  # [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+    print(list(results))  # Expected: [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
 
 # For I/O-bound operations
 with ThreadPool() as pool:
     results = pool.map(lambda x: x * 2, range(10))
-    print(list(results))  # [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
+    print(list(results))  # Expected: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
 
 # Custom number of workers
 with ProcessPool(nodes=4) as pool:
     results = pool.map(lambda x: x * x, range(10))
+    print(list(results))
 ```
 
-### Using Map Decorators
+### Using Synchronous Map Decorators (Core MVP Feature)
 
-The package provides three decorators for different mapping strategies:
+The package provides three decorators for different synchronous mapping strategies using Pathos pools:
 
 ```python
-from twat_mp import amap, imap, pmap
+from twat_mp import amap, imap, pmap # These are synchronous for MVP
 
 # Standard parallel map (eager evaluation)
 @pmap
@@ -406,49 +426,71 @@ summary = pd.DataFrame(results)
 print(summary)
 ```
 
-### Async File Processing
+### Async File Processing (Experimental)
 
-Combine async I/O with parallel processing:
+This example demonstrates combining async I/O with the experimental `AsyncMultiPool`.
 
 ```python
 import asyncio
-import aiofiles
 import os
-from twat_mp import AsyncMultiPool
+# import aiofiles # Requires separate installation: pip install aiofiles
+# from twat_mp import AsyncMultiPool # Ensure 'aio' extra
 
-async def count_words(filename):
+async def count_words_async(filename):
     """Count words in a file asynchronously."""
+    # Note: aiofiles needs to be installed separately.
+    # This example is illustrative of how AsyncMultiPool could be used.
     try:
-        async with aiofiles.open(filename, 'r') as f:
-            content = await f.read()
-            word_count = len(content.split())
-            return {"filename": filename, "word_count": word_count}
+        # Placeholder for async file reading logic
+        # async with aiofiles.open(filename, 'r') as f:
+        #     content = await f.read()
+        #     word_count = len(content.split())
+        # return {"filename": filename, "word_count": word_count}
+        await asyncio.sleep(0.01) # Simulate async read
+        return {"filename": filename, "word_count": len(filename) * 5} # Dummy result
     except Exception as e:
         return {"filename": filename, "error": str(e)}
 
-async def main():
-    # Get all text files in a directory
-    files = [os.path.join("documents", f) for f in os.listdir("documents") 
+async def main_async_files():
+    # from twat_mp import AsyncMultiPool # Ensure 'aio' extra
+    # Create dummy files for example if needed, or use existing text files
+    # For real use, ensure 'documents' directory exists and has .txt files
+    script_dir = os.path.dirname(__file__) if "__file__" in locals() else "."
+    doc_dir = os.path.join(script_dir, "documents_example")
+    os.makedirs(doc_dir, exist_ok=True)
+    if not os.listdir(doc_dir): # Create dummy files if dir is empty
+        for i in range(3):
+            with open(os.path.join(doc_dir, f"file{i}.txt"), "w") as f:
+                f.write(f"This is dummy file {i} with some words.")
+
+    files = [os.path.join(doc_dir, f) for f in os.listdir(doc_dir)
              if f.endswith(".txt")]
+
+    if not files:
+        print("No .txt files found in documents_example directory for async processing example.")
+        return
+
+    # Placeholder for AsyncMultiPool usage
+    # async with AsyncMultiPool() as pool: # Experimental
+    # results = await pool.map(count_words_async, files)
     
-    # Process files in parallel
-    async with AsyncMultiPool() as pool:
-        results = await pool.map(count_words, files)
+    # Simulating results for now as AsyncMultiPool is experimental
+    results = [await count_words_async(f) for f in files]
+
+
+    total_words = sum(r.get("word_count", 0) for r in results if "error" not in r)
     
-    # Calculate total word count
-    total_words = sum(r.get("word_count", 0) for r in results)
-    
-    # Print results
+    print("\nAsync File Processing Results (Experimental):")
     for result in results:
         if "error" in result:
             print(f"Error processing {result['filename']}: {result['error']}")
         else:
             print(f"{result['filename']}: {result['word_count']} words")
-    
-    print(f"Total word count: {total_words}")
+    print(f"Total word count (simulated): {total_words}")
 
-# Run the async main function
-asyncio.run(main())
+# if __name__ == "__main__":
+# import asyncio
+# asyncio.run(main_async_files())
 ```
 
 ## API Reference

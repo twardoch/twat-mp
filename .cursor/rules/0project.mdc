@@ -4,16 +4,22 @@ globs:
 ---
 # About this project
 
-`twat-fs` is a file system utility library focused on robust and extensible file upload capabilities with multiple provider support. It provides:
+`twat-mp` is a Python library that provides parallel processing utilities using Pathos (for synchronous process/thread pools). It simplifies common parallel programming patterns with context managers and decorators.
 
-- Multi-provider upload system with smart fallback (catbox.moe default, plus Dropbox, S3, etc.)
-- Automatic retry for temporary failures, fallback for permanent ones
-- URL validation and clean developer experience with type hints
-- Simple CLI: `python -m twat_fs upload_file path/to/file.txt`
-- Easy installation: `uv pip install twat-fs` (basic) or `uv pip install 'twat-fs[all,dev]'` (all features)
+Key features for MVP v1.0:
+- `ProcessPool`: Context manager for CPU-intensive parallel processing.
+- `ThreadPool`: Context manager for I/O-bound parallel processing.
+- Decorators for easy parallel mapping:
+  - `pmap`: Standard parallel map (eager evaluation).
+  - `imap`: Lazy parallel map returning an iterator.
+  - `amap`: Asynchronous-style map with automatic result retrieval (using synchronous pools).
+- Automatic CPU core detection for optimal default pool sizing.
+- Clean resource management via context managers.
+- Enhanced error propagation from worker processes.
 
 ## Development Notes
-- Uses `uv` for Python package management
-- Quality tools: ruff, mypy, pytest
-- Clear provider protocol for adding new storage backends
-- Strong typing and runtime checks throughout
+- Built on top of the Pathos library.
+- Uses `uv` for Python package management.
+- Quality tools: ruff, mypy, pytest.
+- Focus on robust synchronous parallel processing for the MVP.
+- Async support (via `aiomultiprocess`) is planned for future versions.

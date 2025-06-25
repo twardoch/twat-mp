@@ -8,14 +8,14 @@ This document provides a comprehensive reference for the `twat-mp` package's API
   - [MultiPool](#multipool)
   - [ProcessPool](#processpool)
   - [ThreadPool](#threadpool)
-  - [AsyncMultiPool](#asyncmultipool)
+  - [AsyncMultiPool](#asyncmultipool) (Experimental)
 - [Decorators](#decorators)
   - [pmap](#pmap)
   - [imap](#imap)
   - [amap](#amap)
-  - [apmap](#apmap)
+  - [apmap](#apmap) (Experimental)
 - [Usage Patterns](#usage-patterns)
-  - [Choosing the Right Pool](#choosing-the-right-pool)
+  - [Choosing the Right Pool](#choosing-the-right-pool) (Note on AsyncMultiPool)
   - [Error Handling](#error-handling)
   - [Resource Management](#resource-management)
 
@@ -84,7 +84,9 @@ with ThreadPool() as pool:
     results = pool.map(lambda x: x * 2, range(10))
 ```
 
-### AsyncMultiPool
+### AsyncMultiPool (Experimental)
+
+**Note:** `AsyncMultiPool` and related asynchronous features are currently considered experimental. They rely on the `aiomultiprocess` library (installed with the `[aio]` extra) and are targeted for stabilization in future releases.
 
 ```python
 class AsyncMultiPool:
@@ -92,10 +94,10 @@ class AsyncMultiPool:
         ...
 ```
 
-A context manager for managing an aiomultiprocess.Pool. Provides high-level interface for parallel processing with async/await support.
+A context manager for managing an `aiomultiprocess.Pool`. Provides a high-level interface for parallel processing with async/await support.
 
 **Parameters:**
-- `processes`: Number of processes to use (default: CPU count)
+- `processes`: Number of processes to use (default: CPU count).
 - `initializer`: Optional callable to initialize worker processes
 - `initargs`: Arguments to pass to the initializer
 - `**kwargs`: Additional keyword arguments passed to aiomultiprocess.Pool
@@ -179,7 +181,9 @@ def double(x):
 results = list(double(range(10)))
 ```
 
-### apmap
+### apmap (Experimental)
+
+**Note:** `apmap` is an experimental decorator for use with `AsyncMultiPool` and is subject to stabilization in future releases. Requires the `[aio]` extra.
 
 ```python
 @apmap
@@ -187,29 +191,30 @@ async def func(x):
     ...
 ```
 
-Decorator for async functions to run in parallel using AsyncMultiPool. Requires the 'aio' extra to be installed.
+Decorator for async functions to run in parallel using `AsyncMultiPool`.
 
 **Example:**
 ```python
-@apmap
-async def double(x):
+@apmap # Experimental
+async def double_async(x):
     await asyncio.sleep(0.1)  # Some async work
     return x * 2
 
-async def main():
-    results = await double(range(10))
+async def main_apmap_example():
+    results = await double_async(range(10))
     print(results)
 
-asyncio.run(main())
+# import asyncio
+# asyncio.run(main_apmap_example())
 ```
 
 ## Usage Patterns
 
 ### Choosing the Right Pool
 
-- **ProcessPool**: Best for CPU-intensive tasks that benefit from parallel execution across multiple cores
-- **ThreadPool**: Best for I/O-bound tasks where threads can efficiently wait for I/O operations
-- **AsyncMultiPool**: Best for combining async/await with multiprocessing, particularly useful for mixed workloads
+- **ProcessPool**: Best for CPU-intensive tasks that benefit from parallel execution across multiple cores (core MVP feature).
+- **ThreadPool**: Best for I/O-bound tasks where threads can efficiently wait for I/O operations (core MVP feature).
+- **AsyncMultiPool (Experimental)**: Intended for combining async/await with multiprocessing, particularly useful for mixed I/O-bound and CPU-bound workloads within an async application. Currently experimental.
 
 ### Error Handling
 
@@ -236,15 +241,23 @@ with ProcessPool() as pool:
 # Pool is now closed and resources are freed
 ```
 
-For async pools:
+For async pools (Experimental):
 
 ```python
-async def main():
-    async with AsyncMultiPool() as pool:
-        # Use the pool
-        results = await pool.map(async_func, data)
+async def main_resource_management_async():
+    # from twat_mp import AsyncMultiPool # Ensure 'aio' extra
+    # async with AsyncMultiPool() as pool: # Experimental
+    #     # Use the pool
+    #     async def async_example_func(item):
+    #         await asyncio.sleep(0.01)
+    #         return item * item
+    #     data = range(5)
+    #     results = await pool.map(async_example_func, data)
+    #     print(f"Async results: {results}")
 
     # Pool is now closed and resources are freed
+    print("Async pool resource management example (conceptual).")
 
-asyncio.run(main())
+# import asyncio
+# asyncio.run(main_resource_management_async())
 ```

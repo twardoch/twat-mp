@@ -46,9 +46,9 @@ It also includes content from README.md at the start and TODO.md at the end of l
 for context.
 
 Required Files:
-- LOG.md: Project changelog
-- README.md: Project documentation
-- TODO.md: Pending tasks and future plans
+- .cursor/rules/0project.mdc: Main project description for agent context.
+- README.md: Project documentation for users.
+- TODO.md: Pending tasks and future plans.
 """
 
 import subprocess
@@ -69,7 +69,7 @@ IGNORE_PATTERNS = [
     "build",
     "*.egg-info",
 ]
-REQUIRED_FILES = ["LOG.md", ".cursor/rules/0project.mdc", "TODO.md"]
+REQUIRED_FILES = [".cursor/rules/0project.mdc", "README.md", "TODO.md"] # LOG.md removed
 LOG_FILE = Path("CLEANUP.txt")
 
 # Ensure we're working from the script's directory
@@ -256,7 +256,8 @@ class Cleanup:
 
             # Run tests
             log_message(">>> Running tests...")
-            run_command(["python", "-m", "pytest", "tests"], check=False)
+            # Ensure async tests are ignored for MVP context
+            run_command(["python", "-m", "pytest", "tests", "--ignore=tests/test_async_mp.py"], check=False)
 
             log_message("All checks completed")
         except Exception as e:

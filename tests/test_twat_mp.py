@@ -11,6 +11,11 @@ from twat_mp.mp import WorkerError
 T = TypeVar("T")
 U = TypeVar("U")
 
+# Define CustomError at module level for consistent pickling
+class CustomError(Exception):
+    """Custom exception for testing."""
+    pass
+
 # Test constants
 TEST_PROCESS_POOL_SIZE = 2
 TEST_THREAD_POOL_SIZE = 3
@@ -225,7 +230,8 @@ def test_error_propagation():
             raise ValueError("Test error in pmap")
         return x * x
 
-    with pytest.raises(RuntimeError, match="Failed to create or use pool"):
+    # pmap should now propagate the original ValueError
+    with pytest.raises(ValueError, match="Test error in pmap"):
         list(error_map(iter(range(5))))
 
     @imap
@@ -244,7 +250,8 @@ def test_error_propagation():
             raise ValueError("Test error in amap")
         return x * x
 
-    with pytest.raises(RuntimeError, match="Failed to create or use pool"):
+    # amap should now propagate the original ValueError
+    with pytest.raises(ValueError, match="Test error in amap"):
         error_amap(iter(range(5)))
 
 
@@ -285,7 +292,8 @@ def test_invalid_mapping_method():
         def test_func(x: int) -> int:
             return x * x
 
-        with pytest.raises(RuntimeError, match="Failed to create or use pool"):
+        # mmap raises ValueError if the pool instance (even a mock) lacks the method.
+        with pytest.raises(ValueError, match="Pool does not support mapping method: 'map'"):
             test_func(iter(range(5)))
 
 
@@ -403,11 +411,6 @@ def test_pool_reuse_failure():
 def test_custom_exception_handling():
     """Test handling of custom exceptions in worker functions."""
 
-    class CustomError(Exception):
-        """Custom exception for testing."""
-
-        pass
-
     def raise_custom_error(x: int) -> int:
         if x > 2:
             raise CustomError(f"Value {x} is too large")
@@ -436,7 +439,8 @@ def test_custom_exception_handling():
             raise CustomError(f"Decorated value {x} is too large")
         return x
 
-    with pytest.raises(CustomError) as excinfo_decorator:
+    # Decorators should now propagate the CustomError directly
+    with pytest.raises(CustomError, match="Decorated value 3 is too large"):
         list(decorated_error_func(iter(range(5))))
 
     # Pathos map usually raises the first exception encountered.

@@ -13,7 +13,9 @@ from typing import Any
 
 import pytest
 
-from twat_mp import AsyncMultiPool, apmap
+# For testing experimental async features, import directly from the module
+# to bypass __init__.py's MVP isolation.
+from twat_mp.async_mp import AsyncMultiPool, apmap
 
 
 async def async_double(x: int) -> int:

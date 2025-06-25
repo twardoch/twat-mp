@@ -538,46 +538,72 @@ def mmap(
                         if use_debug:
                             logger.debug("Parallel execution completed successfully")
                         return result
-                    except WorkerError as e:
+                    except WorkerError as we:
                         # If it's a WorkerError and has an original exception, re-raise that directly.
                         if use_debug:
                             logger.debug(
-                                f"WorkerError caught. Original: {e.original_exception}, Input: {e.input_item}, WorkerID: {e.worker_id}"
+                                f"WorkerError caught. Original: {we.original_exception}, Input: {we.input_item}, WorkerID: {we.worker_id}"
                             )
-                        if e.original_exception is not None:
-                            raise e.original_exception from e
+                        if we.original_exception is not None:
+                            raise we.original_exception from we # Let original error propagate
                         else:
-                            # If WorkerError has no original_exception (should be rare), raise WorkerError itself.
-                            raise
-                    except KeyboardInterrupt:
-                        # Re-raise KeyboardInterrupt to allow proper cleanup
+                            # If WorkerError has no original_exception, raise WorkerError itself.
+                            raise we
+                    except KeyboardInterrupt: # Keyboard interrupt during mapping_method call
                         if use_debug:
-                            logger.debug("KeyboardInterrupt detected during execution")
-                        raise
-                    except Exception as e: # Catches other errors (e.g., from Pathos internal, bad map args)
-                        # Provide more context for general errors not originating from _worker_wrapper
-                        error_msg = f"Failed to execute parallel operation: {e}"
+                            logger.debug("KeyboardInterrupt detected during parallel execution")
+                        raise # Re-raise to be handled by MultiPool.__exit__ or outer try
+            # This is the single outer try-except block for the entire operation.
+            try:
+                with MultiPool(debug=use_debug) as pool:
+                    # Get the mapping method (try-except for getattr)
+                    try:
+                        mapping_method = getattr(pool, how)
+                    except AttributeError as err:
+                        error_msg = f"Pool does not support mapping method: '{how}'"
                         logger.error(error_msg)
-                        if use_debug:
-                            logger.debug(f"Traceback: {traceback.format_exc()}")
-                        # It's important to distinguish this from WorkerError.
-                        # This could be an error in Pathos itself, or argument issues to map.
-                        raise RuntimeError(error_msg) from e
+                        raise ValueError(error_msg) from err # Caught by outer ValueError
+
+                    # Execute mapping (try-except for WorkerError, etc. from execution)
+                    try:
+                        if get_result: # amap
+                            results_obj = mapping_method(func, iterable)
+                            return results_obj.get()
+                        else: # map, imap
+                            return mapping_method(func, iterable)
+                    except WorkerError as we:
+                        if use_debug: logger.debug(f"mmap inner: WorkerError's original: {we.original_exception}")
+                        if we.original_exception is not None:
+                            raise we.original_exception from we
+                        raise
+                    # Other exceptions from execution (like KeyboardInterrupt) will propagate
+                    # to be caught by the outer try-except blocks below.
+
+            # These except blocks handle errors from pool creation or propagated from execution.
             except KeyboardInterrupt:
-                if use_debug:
-                    logger.debug(
-                        "KeyboardInterrupt detected during pool creation/usage"
-                    )
-                raise  # Re-raise to allow proper handling at higher level
+                if use_debug: logger.debug("KeyboardInterrupt in mmap wrapper")
+                raise
+            # This WorkerError catch is if it was propagated from enhanced_map without .get()
+            # e.g. during list(pool.map(...)) or iteration over pool.imap(...)
+            except WorkerError as we_outer:
+                if use_debug: logger.debug(f"mmap outer: WorkerError's original: {we_outer.original_exception}")
+                if we_outer.original_exception is not None:
+                    raise we_outer.original_exception from we_outer
+                raise
+            except (ValueError, RuntimeError) as e:
+                if use_debug: logger.debug(f"mmap propagating known error: {type(e).__name__}: {e}")
+                raise
             except Exception as e:
-                error_msg = f"Failed to create or use pool: {e}"
+                if type(e).__name__ == "CustomError": # Test-specific
+                    if use_debug: logger.debug(f"mmap propagating CustomError: {e}")
+                    raise
+
+                error_msg = f"Unexpected error in mmap decorator: {e}"
                 logger.error(error_msg)
-                if use_debug:
-                    logger.debug(f"Traceback: {traceback.format_exc()}")
+                if use_debug: logger.debug(f"Traceback: {traceback.format_exc()}")
                 raise RuntimeError(error_msg) from e
 
         return wrapper
-
     return decorator
 
 

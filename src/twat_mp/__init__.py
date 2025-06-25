@@ -11,6 +11,7 @@ from twat_mp.mp import (
     mmap,
     pmap,
     set_debug_mode,
+    WorkerError,
 )
 
 # TODO: MVP Isolation - Async features temporarily disabled due to test environment hangs.
@@ -27,6 +28,7 @@ __all__ = [
     "MultiPool",
     "ProcessPool",
     "ThreadPool",
+    "WorkerError",
     "__version__",
     "amap",
     # "apmap",          # Temporarily disabled for MVP
