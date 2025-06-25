@@ -1,6 +1,6 @@
-2025-06-25 11:13:34 -
+2025-06-25 15:06:34 -
 === PROJECT STATEMENT ===
-2025-06-25 11:13:34 - ---
+2025-06-25 15:06:34 - ---
 description: About this project
 globs:
 ---
@@ -26,9 +26,9 @@ Key features for MVP v1.0:
 - Focus on robust synchronous parallel processing for the MVP.
 - Async support (via `aiomultiprocess`) is planned for future versions.
 
-2025-06-25 11:13:34 -
+2025-06-25 15:06:34 -
 === Current Status ===
-2025-06-25 11:13:34 - [4.0K]  .
+2025-06-25 15:06:34 - [4.0K]  .
 ├── [4.0K]  .cursor
 │   └── [4.0K]  rules
 │       ├── [1.1K]  0project.mdc
@@ -53,7 +53,7 @@ Key features for MVP v1.0:
 │       └── [134K]  2025-03-04_08-26-ruff-linting-errors-and-fixes.md
 ├── [4.0K]  .venv
 ├── [7.0K]  API_REFERENCE.md
-├── [5.5K]  CHANGELOG.md
+├── [5.3K]  CHANGELOG.md
 ├── [1.0K]  LICENSE
 ├── [8.1K]  PLAN.md
 ├── [ 16K]  README.md
@@ -62,25 +62,26 @@ Key features for MVP v1.0:
 ├── [ 13K]  cleanup.py
 ├── [4.0K]  docs
 │   └── [6.6K]  architecture.md
+├── [535K]  llms.txt
 ├── [5.8K]  pyproject.toml
 ├── [4.0K]  src
 │   └── [4.0K]  twat_mp
 │       ├── [ 777]  __init__.py
 │       ├── [4.0K]  __pycache__
 │       ├── [ 17K]  async_mp.py
-│       └── [ 30K]  mp.py
+│       └── [ 28K]  mp.py
 ├── [4.0K]  tests
 │   ├── [4.0K]  __pycache__
 │   ├── [3.1K]  test_async_mp.py
 │   ├── [6.3K]  test_benchmark.py
-│   └── [ 13K]  test_twat_mp.py
+│   └── [ 14K]  test_twat_mp.py
 └── [239K]  uv.lock
 
-14 directories, 33 files
+14 directories, 34 files
 
-2025-06-25 11:13:34 -
+2025-06-25 15:06:34 -
 Project structure:
-2025-06-25 11:13:34 - [4.0K]  .
+2025-06-25 15:06:34 - [4.0K]  .
 ├── [4.0K]  .cursor
 │   └── [4.0K]  rules
 │       ├── [1.1K]  0project.mdc
@@ -105,7 +106,7 @@ Project structure:
 │       └── [134K]  2025-03-04_08-26-ruff-linting-errors-and-fixes.md
 ├── [4.0K]  .venv
 ├── [7.0K]  API_REFERENCE.md
-├── [5.5K]  CHANGELOG.md
+├── [5.3K]  CHANGELOG.md
 ├── [1.0K]  LICENSE
 ├── [8.1K]  PLAN.md
 ├── [ 16K]  README.md
@@ -114,123 +115,120 @@ Project structure:
 ├── [ 13K]  cleanup.py
 ├── [4.0K]  docs
 │   └── [6.6K]  architecture.md
+├── [535K]  llms.txt
 ├── [5.8K]  pyproject.toml
 ├── [4.0K]  src
 │   └── [4.0K]  twat_mp
 │       ├── [ 777]  __init__.py
 │       ├── [4.0K]  __pycache__
 │       ├── [ 17K]  async_mp.py
-│       └── [ 30K]  mp.py
+│       └── [ 28K]  mp.py
 ├── [4.0K]  tests
 │   ├── [4.0K]  __pycache__
 │   ├── [3.1K]  test_async_mp.py
 │   ├── [6.3K]  test_benchmark.py
-│   └── [ 13K]  test_twat_mp.py
+│   └── [ 14K]  test_twat_mp.py
 └── [239K]  uv.lock
 
-14 directories, 33 files
+14 directories, 34 files
 
-2025-06-25 11:13:34 - HEAD detached from c4ec88a
+2025-06-25 15:06:34 - HEAD detached from 6d52a75
 Changes not staged for commit:
   (use "git add <file>..." to update what will be committed)
   (use "git restore <file>..." to discard changes in working directory)
+	modified:   .cursor/rules/filetree.mdc
 	modified:   CLEANUP.txt
 
 no changes added to commit (use "git add" and/or "git commit -a")
 
-2025-06-25 11:13:34 - HEAD detached from c4ec88a
+2025-06-25 15:06:34 - HEAD detached from 6d52a75
 Changes not staged for commit:
   (use "git add <file>..." to update what will be committed)
   (use "git restore <file>..." to discard changes in working directory)
+	modified:   .cursor/rules/filetree.mdc
 	modified:   CLEANUP.txt
 
 no changes added to commit (use "git add" and/or "git commit -a")
 
-2025-06-25 11:13:34 -
+2025-06-25 15:06:34 -
 === Environment Status ===
-2025-06-25 11:13:34 - Setting up virtual environment
-2025-06-25 11:13:34 - Virtual environment created and activated
-2025-06-25 11:13:34 - Installing package with all extras
-2025-06-25 11:13:34 - Setting up virtual environment
-2025-06-25 11:13:34 - Virtual environment created and activated
-2025-06-25 11:13:36 - Package installed successfully
-2025-06-25 11:13:36 - Running code quality checks
-2025-06-25 11:13:36 - >>> Running code fixes...
-2025-06-25 11:13:36 - >>>Running type checks...
-2025-06-25 11:13:36 - >>> Running tests...
-2025-06-25 11:13:38 - ============================= test session starts ==============================
+2025-06-25 15:06:34 - Setting up virtual environment
+2025-06-25 15:06:35 - Virtual environment created and activated
+2025-06-25 15:06:35 - Installing package with all extras
+2025-06-25 15:06:35 - Setting up virtual environment
+2025-06-25 15:06:35 - Virtual environment created and activated
+2025-06-25 15:06:39 - Package installed successfully
+2025-06-25 15:06:39 - Running code quality checks
+2025-06-25 15:06:39 - >>> Running code fixes...
+2025-06-25 15:06:39 - >>>Running type checks...
+2025-06-25 15:06:39 - >>> Running tests...
+2025-06-25 15:09:29 - ============================= test session starts ==============================
 platform linux -- Python 3.12.11, pytest-8.4.1, pluggy-1.6.0 -- /app/.venv/bin/python
 cachedir: .pytest_cache
 benchmark: 5.1.0 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=100000)
 rootdir: /app
 configfile: pyproject.toml
-plugins: asyncio-1.0.0, cov-6.2.1, benchmark-5.1.0, xdist-3.7.0
+plugins: cov-6.2.1, xdist-3.7.0, asyncio-1.0.0, benchmark-5.1.0
 asyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
-collecting ... collected 0 items / 2 errors
+collecting ... collected 31 items
 
-==================================== ERRORS ====================================
-___________________ ERROR collecting tests/test_benchmark.py ___________________
-.venv/lib/python3.12/site-packages/_pytest/python.py:498: in importtestmodule
-    mod = import_path(
-.venv/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
-    importlib.import_module(module_name)
-/home/jules/.pyenv/versions/3.12.11/lib/python3.12/importlib/__init__.py:90: in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-<frozen importlib._bootstrap>:1387: in _gcd_import
-    ???
-<frozen importlib._bootstrap>:1360: in _find_and_load
-    ???
-<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
-    ???
-<frozen importlib._bootstrap>:935: in _load_unlocked
-    ???
-.venv/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:186: in exec_module
-    exec(co, module.__dict__)
-tests/test_benchmark.py:8: in <module>
-    from twat_mp import ProcessPool, ThreadPool, amap, imap, mmap, pmap
-src/twat_mp/__init__.py:5: in <module>
-    from twat_mp.mp import (
-E     File "/app/src/twat_mp/mp.py", line 564
-E       try:
-E       ^^^
-E   SyntaxError: expected 'except' or 'finally' block
-____________________ ERROR collecting tests/test_twat_mp.py ____________________
-.venv/lib/python3.12/site-packages/_pytest/python.py:498: in importtestmodule
-    mod = import_path(
-.venv/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
-    importlib.import_module(module_name)
-/home/jules/.pyenv/versions/3.12.11/lib/python3.12/importlib/__init__.py:90: in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-<frozen importlib._bootstrap>:1387: in _gcd_import
-    ???
-<frozen importlib._bootstrap>:1360: in _find_and_load
-    ???
-<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
-    ???
-<frozen importlib._bootstrap>:935: in _load_unlocked
-    ???
-.venv/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:186: in exec_module
-    exec(co, module.__dict__)
-tests/test_twat_mp.py:8: in <module>
-    from twat_mp import ProcessPool, ThreadPool, amap, imap, mmap, pmap, set_debug_mode, __version__
-src/twat_mp/__init__.py:5: in <module>
-    from twat_mp.mp import (
-E     File "/app/src/twat_mp/mp.py", line 564
-E       try:
-E       ^^^
-E   SyntaxError: expected 'except' or 'finally' block
-=========================== short test summary info ============================
-ERROR tests/test_benchmark.py
-ERROR tests/test_twat_mp.py
-!!!!!!!!!!!!!!!!!!! Interrupted: 2 errors during collection !!!!!!!!!!!!!!!!!!!!
-============================== 2 errors in 0.43s ===============================
+tests/test_benchmark.py::TestComputeIntensiveBenchmarks::test_sequential_vs_process_pool PASSED [  3%]
+tests/test_benchmark.py::TestComputeIntensiveBenchmarks::test_parallel_implementations[100] PASSED [  6%]
+tests/test_benchmark.py::TestComputeIntensiveBenchmarks::test_parallel_implementations[1000] PASSED [  9%]
+tests/test_benchmark.py::TestComputeIntensiveBenchmarks::test_parallel_implementations[10000] PASSED [ 12%]
+tests/test_benchmark.py::TestIOIntensiveBenchmarks::test_thread_vs_process_pool PASSED [ 16%]
+tests/test_benchmark.py::TestScalabilityBenchmarks::test_worker_scaling[2] PASSED [ 19%]
+tests/test_benchmark.py::TestScalabilityBenchmarks::test_worker_scaling[4] PASSED [ 22%]
+tests/test_benchmark.py::TestScalabilityBenchmarks::test_worker_scaling[8] PASSED [ 25%]
+tests/test_benchmark.py::TestScalabilityBenchmarks::test_worker_scaling[16] PASSED [ 29%]
+tests/test_benchmark.py::TestCompositionBenchmarks::test_chained_operations PASSED [ 32%]
+tests/test_twat_mp.py::test_version PASSED                               [ 35%]
+tests/test_twat_mp.py::test_process_pool_context PASSED                  [ 38%]
+tests/test_twat_mp.py::test_thread_pool_context PASSED                   [ 41%]
+tests/test_twat_mp.py::test_amap_decorator PASSED                        [ 45%]
+tests/test_twat_mp.py::test_pmap_decorator PASSED                        [ 48%]
+tests/test_twat_mp.py::test_imap_decorator PASSED                        [ 51%]
+tests/test_twat_mp.py::test_composed_operations PASSED                   [ 54%]
+tests/test_twat_mp.py::test_pool_nodes_specification PASSED              [ 58%]
+tests/test_twat_mp.py::test_parallel_vs_sequential_performance PASSED    [ 61%]
+tests/test_twat_mp.py::test_mmap_decorator_variants PASSED               [ 64%]
+tests/test_twat_mp.py::test_empty_iterable PASSED                        [ 67%]
+tests/test_twat_mp.py::test_error_propagation PASSED                     [ 70%]
+tests/test_twat_mp.py::test_debug_mode PASSED                            [ 74%]
+tests/test_twat_mp.py::test_invalid_mapping_method PASSED                [ 77%]
+tests/test_twat_mp.py::test_pool_creation_failure PASSED                 [ 80%]
+tests/test_twat_mp.py::test_resource_cleanup_after_exception PASSED      [ 83%]
+tests/test_twat_mp.py::test_keyboard_interrupt_handling PASSED           [ 87%]
+tests/test_twat_mp.py::test_large_data_handling PASSED                   [ 90%]
+tests/test_twat_mp.py::test_nested_pools PASSED                          [ 93%]
+tests/test_twat_mp.py::test_pool_reuse_failure PASSED                    [ 96%]
+tests/test_twat_mp.py::test_custom_exception_handling PASSED             [100%]
 
-2025-06-25 11:13:38 - All checks completed
-2025-06-25 11:13:38 -
+
+--------------------------------------------------------------------------------------------------- benchmark: 10 tests ----------------------------------------------------------------------------------------------------
+Name (time in ms)                                Min                    Max                   Mean              StdDev                 Median                 IQR            Outliers      OPS            Rounds  Iterations
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_worker_scaling[4]                       62.7512 (1.0)          79.5659 (1.0)          65.8824 (1.0)        4.0274 (1.0)          65.0370 (1.0)        3.7878 (1.0)           1;1  15.1786 (1.0)          16           1
+test_worker_scaling[2]                       83.8970 (1.34)        236.9906 (2.98)        149.2996 (2.27)      62.3641 (15.49)       150.6861 (2.32)     128.9514 (34.04)         8;0   6.6979 (0.44)         12           1
+test_worker_scaling[8]                       86.8883 (1.38)        104.3879 (1.31)         93.8805 (1.42)       5.4644 (1.36)         92.4650 (1.42)       4.7890 (1.26)          3;2  10.6518 (0.70)         11           1
+test_worker_scaling[16]                     144.5551 (2.30)        162.4423 (2.04)        149.4525 (2.27)       5.9911 (1.49)        146.9242 (2.26)       6.2582 (1.65)          1;1   6.6911 (0.44)          8           1
+test_sequential_vs_process_pool             193.1884 (3.08)        203.5332 (2.56)        198.0322 (3.01)       4.0489 (1.01)        196.6976 (3.02)       5.9135 (1.56)          2;0   5.0497 (0.33)          5           1
+test_parallel_implementations[100]          260.5582 (4.15)        271.8803 (3.42)        265.8928 (4.04)       4.6132 (1.15)        265.3221 (4.08)       7.6319 (2.01)          2;0   3.7609 (0.25)          5           1
+test_thread_vs_process_pool                 602.6476 (9.60)        615.3412 (7.73)        608.9287 (9.24)       4.8253 (1.20)        608.3017 (9.35)       6.8547 (1.81)          2;0   1.6422 (0.11)          5           1
+test_parallel_implementations[1000]       1,547.3128 (24.66)     1,776.2102 (22.32)     1,619.2578 (24.58)     94.1956 (23.39)     1,591.2984 (24.47)    117.8967 (31.13)         1;0   0.6176 (0.04)          5           1
+test_chained_operations                   1,633.9279 (26.04)     1,682.8065 (21.15)     1,648.3724 (25.02)     20.1004 (4.99)      1,638.7270 (25.20)     21.4183 (5.65)          1;0   0.6067 (0.04)          5           1
+test_parallel_implementations[10000]     14,692.8523 (234.14)   16,840.7606 (211.66)   15,322.7425 (232.58)   878.4128 (218.11)   14,887.1619 (228.90)   860.7223 (227.24)        1;0   0.0653 (0.00)          5           1
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Legend:
+  Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
+  OPS: Operations Per Second, computed as 1 / Mean
+======================== 31 passed in 168.27s (0:02:48) ========================
+
+2025-06-25 15:09:29 - All checks completed
+2025-06-25 15:09:29 -
 === TODO.md ===
-2025-06-25 11:13:38 - # TODO for MVP Streamlining
+2025-06-25 15:09:29 - # TODO for MVP Streamlining
 
 - [x] **Phase 1: Confirm MVP Scope**
   - [x] Confirm async features (`AsyncMultiPool`, `apmap`) are out of scope for MVP v1.0.
@@ -272,4 +270,4 @@ ERROR tests/test_twat_mp.py
   - [ ] Perform a final review of all changes and documentation.
   - [ ] Submit with appropriate branch name and commit message.
 
-2025-06-25 11:13:38 - Failed to mix repository: [Errno 2] No such file or directory: 'repomix'
+2025-06-25 15:09:29 - Failed to mix repository: [Errno 2] No such file or directory: 'repomix'

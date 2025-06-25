@@ -553,56 +553,26 @@ def mmap(
                         if use_debug:
                             logger.debug("KeyboardInterrupt detected during parallel execution")
                         raise # Re-raise to be handled by MultiPool.__exit__ or outer try
-            # This is the single outer try-except block for the entire operation.
-            try:
-                with MultiPool(debug=use_debug) as pool:
-                    # Get the mapping method (try-except for getattr)
-                    try:
-                        mapping_method = getattr(pool, how)
-                    except AttributeError as err:
-                        error_msg = f"Pool does not support mapping method: '{how}'"
-                        logger.error(error_msg)
-                        raise ValueError(error_msg) from err # Caught by outer ValueError
-
-                    # Execute mapping (try-except for WorkerError, etc. from execution)
-                    try:
-                        if get_result: # amap
-                            results_obj = mapping_method(func, iterable)
-                            return results_obj.get()
-                        else: # map, imap
-                            return mapping_method(func, iterable)
-                    except WorkerError as we:
-                        if use_debug: logger.debug(f"mmap inner: WorkerError's original: {we.original_exception}")
-                        if we.original_exception is not None:
-                            raise we.original_exception from we
-                        raise
-                    # Other exceptions from execution (like KeyboardInterrupt) will propagate
-                    # to be caught by the outer try-except blocks below.
-
             # These except blocks handle errors from pool creation or propagated from execution.
             except KeyboardInterrupt:
                 if use_debug: logger.debug("KeyboardInterrupt in mmap wrapper")
                 raise
-            # This WorkerError catch is if it was propagated from enhanced_map without .get()
-            # e.g. during list(pool.map(...)) or iteration over pool.imap(...)
-            except WorkerError as we_outer:
+            except WorkerError as we_outer: # This can happen if e.g. imap iterator is consumed outside
                 if use_debug: logger.debug(f"mmap outer: WorkerError's original: {we_outer.original_exception}")
                 if we_outer.original_exception is not None:
-                    raise we_outer.original_exception from we_outer
-                raise
-            except (ValueError, RuntimeError) as e:
+                    raise we_outer.original_exception from we_outer # Propagate original error
+                raise # Raise WorkerError if no original_exception
+            except (ValueError, RuntimeError) as e: # Catch known errors from pool/mapping setup
                 if use_debug: logger.debug(f"mmap propagating known error: {type(e).__name__}: {e}")
                 raise
-            except Exception as e:
-                if type(e).__name__ == "CustomError": # Test-specific
+            except Exception as e: # Catch any other unexpected errors
+                if type(e).__name__ == "CustomError": # Specific for tests, let it propagate
                     if use_debug: logger.debug(f"mmap propagating CustomError: {e}")
                     raise
-
-                error_msg = f"Unexpected error in mmap decorator: {e}"
+                error_msg = f"Unexpected error in mmap decorator operation: {e}"
                 logger.error(error_msg)
                 if use_debug: logger.debug(f"Traceback: {traceback.format_exc()}")
                 raise RuntimeError(error_msg) from e
-
         return wrapper
     return decorator
 
