@@ -18,16 +18,17 @@ This document explains the architecture of the `twat-mp` package using simple di
            +----------------+----------------+
            |                |                |
            v                v                v
-+------------------+ +---------------+ +---------------+
-|  Process-based   | |  Thread-based | |  Async-based  |
-|  Parallelism     | |  Parallelism  | |  Parallelism  |
-+------------------+ +---------------+ +---------------+
-|                  | |               | |               |
-| - MultiPool      | | - ThreadPool  | | - AsyncMultiPool |
-| - ProcessPool    | |               | |               |
-| - pmap, imap,    | |               | | - apmap       |
-|   amap decorators| |               | |               |
-+------------------+ +---------------+ +---------------+
++------------------+ +---------------+ +---------------------+
+|  Process-based   | |  Thread-based | |  Async-based        |
+|  Parallelism     | |  Parallelism  | |  Parallelism        |
+|  (Core MVP)      | |  (Core MVP)   | |  (Experimental)     |
++------------------+ +---------------+ +---------------------+
+|                  | |               | |                     |
+| - MultiPool      | | - ThreadPool  | | - AsyncMultiPool    |
+| - ProcessPool    | |               | |   (Experimental)    |
+| - pmap, imap,    | |               | | - apmap             |
+|   amap decorators| |               | |   (Experimental)    |
++------------------+ +---------------+ +---------------------+
            |                |                |
            |                |                |
            v                v                v
@@ -35,15 +36,15 @@ This document explains the architecture of the `twat-mp` package using simple di
 |                 Underlying Libraries                  |
 +---------------------------+---------------------------+
 |                                                       |
-|  - pathos (ProcessPool, ThreadPool)                   |
-|  - aiomultiprocess (AsyncMultiPool)                   |
+|  - pathos (for ProcessPool, ThreadPool - Core MVP)    |
+|  - aiomultiprocess (for AsyncMultiPool - Experimental)|
 |                                                       |
 +-------------------------------------------------------+
 ```
 
 ## Execution Flow
 
-### Process/Thread Pool Execution Flow
+### Process/Thread Pool Execution Flow (Core MVP)
 
 ```
 +-------------+     +-------------+     +----------------+
@@ -74,7 +75,7 @@ This document explains the architecture of the `twat-mp` package using simple di
                     +-------------+
 ```
 
-### Async Pool Execution Flow
+### Async Pool Execution Flow (Experimental Feature)
 
 ```
 +-------------+     +-------------+     +----------------+
@@ -147,6 +148,7 @@ This document explains the architecture of the `twat-mp` package using simple di
 
 +------------------+
 | AsyncMultiPool   |
+| (Experimental)   |
 +------------------+
 ```
 
@@ -161,8 +163,8 @@ This document explains the architecture of the `twat-mp` package using simple di
                         v
           +-------------+-------------+-------------+
           |             |             |             |
-+-----------------+  +------+  +------+  +---------+
-|      pmap       |  | imap |  | amap |  |  apmap  |
-| (eager eval)    |  | (lazy)|  |(async)|  |(async) |
-+-----------------+  +------+  +------+  +---------+
++-----------------+  +------+  +------+  +-----------------+
+|      pmap       |  | imap |  | amap |  |  apmap          |
+| (eager eval)    |  | (lazy)|  |(async)|  |  (Experimental) |
++-----------------+  +------+  +------+  +-----------------+
 ```

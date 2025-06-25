@@ -36,9 +36,9 @@ classifiers = [
 # External packages required for the project to function
 dependencies = [
     "pathos>=0.3.3", # Parallel processing library
-    "twat>=1.8.1",
-    "aiomultiprocess>=0.9.1"
+    "twat>=1.8.1"
     # Main twat package
+    # aiomultiprocess is now an optional dependency
 ]
 
 [[project.authors]]
@@ -71,12 +71,15 @@ test = [
     "matplotlib>=3.7.0", # For benchmark visualization
 
 ]
+aio = [
+    "aiomultiprocess>=0.9.1" # For asynchronous multiprocessing features
+]
 dev = ["pre-commit>=3.6.0"]
 all = [
     "twat>=1.0.0",
     "pathos>=0.3.3",
-    "aiomultiprocess>=0.9.1"
-    # Include aio in all
+    "aiomultiprocess>=0.9.1" # Ensure aiomultiprocess is part of 'all'
+    # Alternatively, could be "twat-mp[aio]" if preferred, but direct listing is also fine.
 ]
 
 [tool.hatch.envs.test]

@@ -253,3 +253,7 @@ coverage.xml
 .benchmarks/
 
 _private
+
+# Generated files from cleanup.py
+CLEANUP.txt
+REPO_CONTENT.txt
