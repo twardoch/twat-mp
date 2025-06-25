@@ -1,6 +1,6 @@
-2025-06-25 15:06:34 -
+2025-03-05 12:14:24 - 
 === PROJECT STATEMENT ===
-2025-06-25 15:06:34 - ---
+2025-03-05 12:14:24 - ---
 description: About this project
 globs:
 ---
@@ -26,12 +26,12 @@ Key features for MVP v1.0:
 - Focus on robust synchronous parallel processing for the MVP.
 - Async support (via `aiomultiprocess`) is planned for future versions.
 
-2025-06-25 15:06:34 -
+2025-03-05 12:14:24 - 
 === Current Status ===
-2025-06-25 15:06:34 - [4.0K]  .
-├── [4.0K]  .cursor
-│   └── [4.0K]  rules
-│       ├── [1.1K]  0project.mdc
+2025-03-05 12:14:24 - [ 928]  .
+├── [  96]  .cursor
+│   └── [ 224]  rules
+│       ├── [ 821]  0project.mdc
 │       ├── [ 515]  cleanup.mdc
 │       ├── [2.0K]  filetree.mdc
 │       └── [2.0K]  quality.mdc
@@ -51,9 +51,10 @@ Key features for MVP v1.0:
 │       ├── [ 644]  2025-03-04_07-54-untitled.md
 │       ├── [1.2K]  2025-03-04_07-59-project-maintenance-and-documentation-update.md
 │       └── [134K]  2025-03-04_08-26-ruff-linting-errors-and-fixes.md
-├── [4.0K]  .venv
-├── [7.0K]  API_REFERENCE.md
-├── [5.3K]  CHANGELOG.md
+├── [ 288]  .venv
+├── [6.0K]  API_REFERENCE.md
+├── [3.8K]  CHANGELOG.md
+├── [ 939]  CLEANUP.txt
 ├── [1.0K]  LICENSE
 ├── [8.1K]  PLAN.md
 ├── [ 16K]  README.md
@@ -79,12 +80,12 @@ Key features for MVP v1.0:
 
 14 directories, 34 files
 
-2025-06-25 15:06:34 -
+2025-03-05 12:14:24 - 
 Project structure:
-2025-06-25 15:06:34 - [4.0K]  .
-├── [4.0K]  .cursor
-│   └── [4.0K]  rules
-│       ├── [1.1K]  0project.mdc
+2025-03-05 12:14:24 - [ 928]  .
+├── [  96]  .cursor
+│   └── [ 224]  rules
+│       ├── [ 821]  0project.mdc
 │       ├── [ 515]  cleanup.mdc
 │       ├── [2.0K]  filetree.mdc
 │       └── [2.0K]  quality.mdc
@@ -104,9 +105,10 @@ Project structure:
 │       ├── [ 644]  2025-03-04_07-54-untitled.md
 │       ├── [1.2K]  2025-03-04_07-59-project-maintenance-and-documentation-update.md
 │       └── [134K]  2025-03-04_08-26-ruff-linting-errors-and-fixes.md
-├── [4.0K]  .venv
-├── [7.0K]  API_REFERENCE.md
-├── [5.3K]  CHANGELOG.md
+├── [ 288]  .venv
+├── [6.0K]  API_REFERENCE.md
+├── [3.8K]  CHANGELOG.md
+├── [ 939]  CLEANUP.txt
 ├── [1.0K]  LICENSE
 ├── [8.1K]  PLAN.md
 ├── [ 16K]  README.md
@@ -130,7 +132,10 @@ Project structure:
 │   └── [ 14K]  test_twat_mp.py
 └── [239K]  uv.lock
 
-14 directories, 34 files
+13 directories, 34 files
+
+2025-03-05 12:14:24 - On branch main
+Your branch is up to date with 'origin/main'.
 
 2025-06-25 15:06:34 - HEAD detached from 6d52a75
 Changes not staged for commit:
@@ -141,7 +146,9 @@ Changes not staged for commit:
 
 no changes added to commit (use "git add" and/or "git commit -a")
 
-2025-06-25 15:06:34 - HEAD detached from 6d52a75
+2025-03-05 12:14:24 - On branch main
+Your branch is up to date with 'origin/main'.
+
 Changes not staged for commit:
   (use "git add <file>..." to update what will be committed)
   (use "git restore <file>..." to discard changes in working directory)
@@ -150,20 +157,20 @@ Changes not staged for commit:
 
 no changes added to commit (use "git add" and/or "git commit -a")
 
-2025-06-25 15:06:34 -
+2025-03-05 12:14:24 - 
 === Environment Status ===
-2025-06-25 15:06:34 - Setting up virtual environment
-2025-06-25 15:06:35 - Virtual environment created and activated
-2025-06-25 15:06:35 - Installing package with all extras
-2025-06-25 15:06:35 - Setting up virtual environment
-2025-06-25 15:06:35 - Virtual environment created and activated
-2025-06-25 15:06:39 - Package installed successfully
-2025-06-25 15:06:39 - Running code quality checks
-2025-06-25 15:06:39 - >>> Running code fixes...
-2025-06-25 15:06:39 - >>>Running type checks...
-2025-06-25 15:06:39 - >>> Running tests...
-2025-06-25 15:09:29 - ============================= test session starts ==============================
-platform linux -- Python 3.12.11, pytest-8.4.1, pluggy-1.6.0 -- /app/.venv/bin/python
+2025-03-05 12:14:24 - Setting up virtual environment
+2025-03-05 12:14:28 - Virtual environment created and activated
+2025-03-05 12:14:28 - Installing package with all extras
+2025-03-05 12:14:28 - Setting up virtual environment
+2025-03-05 12:14:28 - Virtual environment created and activated
+2025-03-05 12:14:30 - Package installed successfully
+2025-03-05 12:14:30 - Running code quality checks
+2025-03-05 12:14:30 - >>> Running code fixes...
+2025-03-05 12:14:31 - >>>Running type checks...
+2025-03-05 12:14:31 - >>> Running tests...
+2025-03-05 12:17:03 - ============================= test session starts ==============================
+platform darwin -- Python 3.12.8, pytest-8.3.5, pluggy-1.5.0 -- /Users/adam/Developer/vcs/github.twardoch/pub/twat-packages/_good/twat/plugins/repos/twat_mp/.venv/bin/python
 cachedir: .pytest_cache
 benchmark: 5.1.0 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=100000)
 rootdir: /app
@@ -205,69 +212,127 @@ tests/test_twat_mp.py::test_pool_reuse_failure PASSED                    [ 96%]
 tests/test_twat_mp.py::test_custom_exception_handling PASSED             [100%]
 
 
---------------------------------------------------------------------------------------------------- benchmark: 10 tests ----------------------------------------------------------------------------------------------------
-Name (time in ms)                                Min                    Max                   Mean              StdDev                 Median                 IQR            Outliers      OPS            Rounds  Iterations
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-test_worker_scaling[4]                       62.7512 (1.0)          79.5659 (1.0)          65.8824 (1.0)        4.0274 (1.0)          65.0370 (1.0)        3.7878 (1.0)           1;1  15.1786 (1.0)          16           1
-test_worker_scaling[2]                       83.8970 (1.34)        236.9906 (2.98)        149.2996 (2.27)      62.3641 (15.49)       150.6861 (2.32)     128.9514 (34.04)         8;0   6.6979 (0.44)         12           1
-test_worker_scaling[8]                       86.8883 (1.38)        104.3879 (1.31)         93.8805 (1.42)       5.4644 (1.36)         92.4650 (1.42)       4.7890 (1.26)          3;2  10.6518 (0.70)         11           1
-test_worker_scaling[16]                     144.5551 (2.30)        162.4423 (2.04)        149.4525 (2.27)       5.9911 (1.49)        146.9242 (2.26)       6.2582 (1.65)          1;1   6.6911 (0.44)          8           1
-test_sequential_vs_process_pool             193.1884 (3.08)        203.5332 (2.56)        198.0322 (3.01)       4.0489 (1.01)        196.6976 (3.02)       5.9135 (1.56)          2;0   5.0497 (0.33)          5           1
-test_parallel_implementations[100]          260.5582 (4.15)        271.8803 (3.42)        265.8928 (4.04)       4.6132 (1.15)        265.3221 (4.08)       7.6319 (2.01)          2;0   3.7609 (0.25)          5           1
-test_thread_vs_process_pool                 602.6476 (9.60)        615.3412 (7.73)        608.9287 (9.24)       4.8253 (1.20)        608.3017 (9.35)       6.8547 (1.81)          2;0   1.6422 (0.11)          5           1
-test_parallel_implementations[1000]       1,547.3128 (24.66)     1,776.2102 (22.32)     1,619.2578 (24.58)     94.1956 (23.39)     1,591.2984 (24.47)    117.8967 (31.13)         1;0   0.6176 (0.04)          5           1
-test_chained_operations                   1,633.9279 (26.04)     1,682.8065 (21.15)     1,648.3724 (25.02)     20.1004 (4.99)      1,638.7270 (25.20)     21.4183 (5.65)          1;0   0.6067 (0.04)          5           1
-test_parallel_implementations[10000]     14,692.8523 (234.14)   16,840.7606 (211.66)   15,322.7425 (232.58)   878.4128 (218.11)   14,887.1619 (228.90)   860.7223 (227.24)        1;0   0.0653 (0.00)          5           1
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------- benchmark: 10 tests -----------------------------------------------------------------------------------------------------
+Name (time in ms)                               Min                    Max                   Mean                StdDev                Median                   IQR            Outliers      OPS            Rounds  Iterations
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_worker_scaling[4]                      41.9783 (1.0)          47.1142 (1.0)          44.2918 (1.0)          1.4971 (1.20)        43.7870 (1.0)          2.6489 (1.85)         10;0  22.5775 (1.0)          23           1
+test_worker_scaling[8]                      58.3193 (1.39)         68.1674 (1.45)         62.4034 (1.41)         2.7687 (2.23)        61.7114 (1.41)         2.2490 (1.57)          6;1  16.0248 (0.71)         18           1
+test_worker_scaling[2]                      59.2213 (1.41)         63.7750 (1.35)         61.6094 (1.39)         1.2434 (1.0)         61.7286 (1.41)         1.4327 (1.0)           5;0  16.2313 (0.72)         16           1
+test_worker_scaling[16]                    101.9173 (2.43)        124.1746 (2.64)        109.8034 (2.48)         7.2305 (5.82)       108.0602 (2.47)         6.4675 (4.51)          3;2   9.1072 (0.40)         11           1
+test_thread_vs_process_pool                199.5582 (4.75)        208.8766 (4.43)        205.3651 (4.64)         3.9273 (3.16)       206.0938 (4.71)         6.2821 (4.38)          1;0   4.8694 (0.22)          5           1
+test_sequential_vs_process_pool            531.9328 (12.67)       613.5726 (13.02)       576.9622 (13.03)       31.7951 (25.57)      572.3958 (13.07)       45.7457 (31.93)         2;0   1.7332 (0.08)          5           1
+test_parallel_implementations[100]         660.5534 (15.74)       867.4417 (18.41)       795.6378 (17.96)       80.4222 (64.68)      810.8718 (18.52)       86.5960 (60.44)         1;0   1.2569 (0.06)          5           1
+test_parallel_implementations[1000]      1,474.2385 (35.12)     1,719.5182 (36.50)     1,564.3989 (35.32)       97.6057 (78.50)    1,542.6586 (35.23)      132.5505 (92.52)         1;0   0.6392 (0.03)          5           1
+test_chained_operations                  1,699.2698 (40.48)     1,750.4923 (37.15)     1,734.0550 (39.15)       20.7637 (16.70)    1,744.7672 (39.85)       23.4345 (16.36)         1;0   0.5767 (0.03)          5           1
+test_parallel_implementations[10000]     9,827.7642 (234.12)   16,253.7122 (344.99)   11,135.2195 (251.41)   2,861.4149 (>1000.0)  9,876.1762 (225.55)   1,637.3544 (>1000.0)       1;1   0.0898 (0.00)          5           1
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Legend:
   Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
   OPS: Operations Per Second, computed as 1 / Mean
-======================== 31 passed in 168.27s (0:02:48) ========================
+================== 31 passed, 8 skipped in 150.39s (0:02:30) ===================
 
-2025-06-25 15:09:29 - All checks completed
-2025-06-25 15:09:29 -
+2025-03-05 12:17:03 - All checks completed
+2025-03-05 12:17:03 - 
 === TODO.md ===
-2025-06-25 15:09:29 - # TODO for MVP Streamlining
+2025-03-05 12:17:03 - ---
+this_file: TODO.md
+---
 
-- [x] **Phase 1: Confirm MVP Scope**
-  - [x] Confirm async features (`AsyncMultiPool`, `apmap`) are out of scope for MVP v1.0.
+# TODO
 
-- [x] **Phase 2: Refine Project Metadata and Documentation**
-  - [x] Update `README.md` for MVP scope (sync focus, async as experimental).
-  - [x] Update `API_REFERENCE.md` for MVP scope.
-  - [x] Update `docs/architecture.md` for MVP scope.
-  - [x] Correct project description in `.cursor/rules/0project.mdc`.
-  - [x] Consolidate `LOG.md` into `CHANGELOG.md` and delete `LOG.md`.
-  - [x] Review and remove `VERSION.txt` if redundant with `hatch-vcs`.
+Tip: Periodically run `python ./cleanup.py status` to see results of lints and tests. Use `uv pip ...` not `pip ...`
 
-- [x] **Phase 3: Streamline Codebase for MVP**
-  - [x] Ensure `src/twat_mp/__init__.py` exports only MVP synchronous components + `WorkerError`.
-  - [x] Isolate `src/twat_mp/async_mp.py` (unused by `__init__.py` for MVP).
-  - [x] Review `src/twat_mp/mp.py` (`MultiPool.__enter__` patching, `mmap` factory) for MVP suitability.
-  - [x] Update `pyproject.toml`: `aiomultiprocess` as optional `[aio]` extra, ensure async tests skipped by default.
 
-- [x] **Phase 4: Refine `cleanup.py` and Meta-Files**
-  - [x] Update `cleanup.py`: Remove `LOG.md` from `REQUIRED_FILES` and docstring.
-  - [x] Update `cleanup.py`: Ensure `_run_checks` uses pytest args to ignore async tests.
-  - [x] Add `CLEANUP.txt` and `REPO_CONTENT.txt` to `.gitignore`.
+## Phase 1
 
-- [x] **Phase 5: Testing Review**
-  - [x] Adjust `tests/test_async_mp.py` imports to use `twat_mp.async_mp` for independent execution.
-  - [x] Ensure default test configurations skip async tests.
-  - [x] Review `tests/test_twat_mp.py` and `tests/test_benchmark.py` for MVP scope.
+- [ ] Add a CLI interface for common operations
+- [ ] Add support for cancellation of running tasks
+- [ ] Implement progress tracking for long-running parallel operations
+- [ ] Implement backpressure mechanisms for memory-intensive operations
+- [ ] Add support for process affinity and priority settings
+- [ ] Implement a unified interface for all pool types
+- [ ] Add support for custom serialization/deserialization
+- [ ] Add context manager for automatic resource cleanup across all parallel operations
+- [ ] Implement adaptive pool sizing based on workload and system resources
+- [ ] Add support for task prioritization and scheduling
 
-- [x] **Phase 6: Create Planning Documents (This Task)**
-  - [x] Write detailed plan to `PLAN.md`.
-  - [x] Create summarized checklist in `TODO.md` (and update with progress).
+## Phase 2
 
-- [x] **Phase 7: Implementation**
-  - [x] Execute all planned changes (covered by completing Phases 1-5).
-  - [ ] Update `CHANGELOG.md` with all changes.
+- [ ] Increase test coverage to at least 90%
+- [ ] Implement stress tests for high concurrency scenarios
+- [ ] Add tests for resource leaks and memory usage
+- [ ] Add tests for different Python versions and platforms
+- [ ] Implement property-based testing for robustness
 
-- [ ] **Phase 8: Final Review and Submission**
-  - [ ] Run all checks (`cleanup.py status`).
-  - [ ] Perform a final review of all changes and documentation.
-  - [ ] Submit with appropriate branch name and commit message.
+## Phase 3
 
-2025-06-25 15:09:29 - Failed to mix repository: [Errno 2] No such file or directory: 'repomix'
+- [ ] Optimize serialization/deserialization for better performance
+- [ ] Optimize memory usage for large datasets
+- [ ] Implement caching mechanisms for repeated operations
+- [ ] Profile and optimize critical code paths
+- [ ] Add performance comparison with native multiprocessing
+- [ ] Implement workload-specific optimization strategies
+
+## Phase 4
+
+- [ ] Implement compatibility with other multiprocessing libraries
+- [ ] Add support for distributed processing across multiple machines
+- [ ] Add support for GPU acceleration where applicable
+- [ ] Implement integration with dask and other distributed computing frameworks
+- [ ] Add support for cloud-based parallel processing
+
+## User Experience
+
+- [ ] Implement automatic pool selection based on workload characteristics
+- [ ] Add progress bars and status reporting for long-running tasks
+- [ ] Create wizard-like interfaces for common operations
+
+## Package Management
+
+- [ ] Create a conda package for easier installation
+- [ ] Implement automated release process with GitHub Actions
+- [ ] Add support for Windows-specific optimizations
+- [ ] Create development documentation for contributors
+
+2025-03-05 12:17:04 - 
+📦 Repomix v0.2.29
+
+No custom config found at repomix.config.json or global config at /Users/adam/.config/repomix/repomix.config.json.
+You can add a config file for additional settings. Please check https://github.com/yamadashy/repomix for more information.
+⠙ Collecting files...
+[2K[1A[2K[G⠹ Running security check...
+[2K[1A[2K[G⠸ Processing files...
+[2K[1A[2K[G⠼ Processing file... (8/24) src/twat_mp/__init__.py
+[2K[1A[2K[G⠴ Calculating metrics...
+[2K[1A[2K[G⠦ Calculating metrics...
+[2K[1A[2K[G⠧ Calculating metrics...
+[2K[1A[2K[G⠇ Calculating metrics... (21/24) pyproject.toml
+[2K[1A[2K[G✔ Packing completed successfully!
+
+📈 Top 5 Files by Character Count and Token Count:
+──────────────────────────────────────────────────
+1.  README.md (12,926 chars, 3,189 tokens)
+2.  docs/architecture.md (6,569 chars, 1,130 tokens)
+3.  API_REFERENCE.md (6,129 chars, 1,508 tokens)
+4.  cleanup.py (5,904 chars, 1,316 tokens)
+5.  pyproject.toml (5,439 chars, 1,572 tokens)
+
+🔎 Security Check:
+──────────────────
+✔ No suspicious files detected.
+
+📊 Pack Summary:
+────────────────
+  Total Files: 24 files
+  Total Chars: 79,941 chars
+ Total Tokens: 19,213 tokens
+       Output: REPO_CONTENT.txt
+     Security: ✔ No suspicious files detected
+
+🎉 All Done!
+Your repository has been successfully packed.
+
+💡 Repomix is now available in your browser! Try it at https://repomix.com
+
+2025-03-05 12:17:04 - Repository content mixed into REPO_CONTENT.txt

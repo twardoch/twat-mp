@@ -357,7 +357,6 @@ class MultiPool:
                     # Last resort, just let it go
                     if self.debug:
                         logger.debug(f"Failed to terminate pool: {e2}")
-                    pass
             finally:
                 # Clear the pool to free up resources
                 try:
@@ -369,7 +368,6 @@ class MultiPool:
                 except Exception as e:
                     if self.debug:
                         logger.debug(f"Error clearing pool resources: {e}")
-                    pass
                 self.pool = None
                 if self.debug:
                     logger.debug("Pool reference set to None")

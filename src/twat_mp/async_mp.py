@@ -50,13 +50,9 @@ import traceback
 from functools import wraps
 from typing import (
     Any,
-    AsyncIterator,
-    Awaitable,
-    Callable,
-    Iterable,
     TypeVar,
-    Optional,
 )
+from collections.abc import AsyncIterator, Awaitable, Callable, Iterable
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -74,8 +70,6 @@ except ImportError:
     # Define a placeholder type for type checking
     class AioPool:  # type: ignore
         """Placeholder for aiomultiprocess.Pool when not available."""
-
-        pass
 
 
 T = TypeVar("T")
@@ -149,9 +143,9 @@ class AsyncMultiPool:
 
     def __init__(
         self,
-        processes: Optional[int] = None,
-        initializer: Optional[Callable[..., Any]] = None,
-        initargs: Optional[tuple[Any, ...]] = None,
+        processes: int | None = None,
+        initializer: Callable[..., Any] | None = None,
+        initargs: tuple[Any, ...] | None = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -176,7 +170,7 @@ class AsyncMultiPool:
         self.initializer = initializer
         self.initargs = initargs or ()
         self.kwargs = kwargs
-        self.pool: Optional[AioPool] = None
+        self.pool: AioPool | None = None
         self._cleanup_attempted = False
 
     async def __aenter__(self) -> "AsyncMultiPool":

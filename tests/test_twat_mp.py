@@ -1,7 +1,7 @@
 """Test suite for twat_mp."""
 
 import time
-from typing import TypeVar, List
+from typing import TypeVar
 from unittest.mock import patch, MagicMock
 
 import pytest
@@ -315,8 +315,6 @@ def test_resource_cleanup_after_exception():
     class TestError(Exception):
         """Custom exception for testing."""
 
-        pass
-
     # Mock the pool to track cleanup calls
     with patch("twat_mp.mp.MultiPool.__exit__") as mock_exit:
         try:
@@ -336,7 +334,7 @@ def test_keyboard_interrupt_handling():
         with patch("pathos.pools.ProcessPool.join") as mock_join:
             try:
                 with ProcessPool():
-                    raise KeyboardInterrupt()
+                    raise KeyboardInterrupt
             except KeyboardInterrupt:
                 pass
 
@@ -368,7 +366,7 @@ def test_large_data_handling():
 def test_nested_pools():
     """Test nested pool usage."""
 
-    def nested_pool_func(x: int) -> List[int]:
+    def nested_pool_func(x: int) -> list[int]:
         # Create a nested pool inside a worker function
         with ThreadPool(nodes=2) as inner_pool:
             # Square each number from 0 to x
@@ -410,6 +408,9 @@ def test_pool_reuse_failure():
 
 def test_custom_exception_handling():
     """Test handling of custom exceptions in worker functions."""
+
+    class CustomError(Exception):
+        """Custom exception for testing."""
 
     def raise_custom_error(x: int) -> int:
         if x > 2:
