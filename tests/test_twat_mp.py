@@ -445,4 +445,8 @@ def test_custom_exception_handling():
 
     # Pathos map usually raises the first exception encountered.
     # The failing input items are 3 and 4. The first one is 3.
-    assert "Decorated value 3 is too large" in str(excinfo_decorator.value)
+    # The test expects a CustomError with "Decorated value 3 is too large".
+    # We need to capture the exception info for the decorator call to assert this.
+    with pytest.raises(CustomError, match="Decorated value 3 is too large") as excinfo_decorator_actual:
+        list(decorated_error_func(iter(range(5))))
+    assert "Decorated value 3 is too large" in str(excinfo_decorator_actual.value)

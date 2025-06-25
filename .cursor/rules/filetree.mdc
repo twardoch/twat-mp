@@ -27,7 +27,7 @@ globs:
 │       └── [134K]  2025-03-04_08-26-ruff-linting-errors-and-fixes.md
 ├── [4.0K]  .venv
 ├── [7.0K]  API_REFERENCE.md
-├── [5.5K]  CHANGELOG.md
+├── [5.3K]  CHANGELOG.md
 ├── [1.0K]  LICENSE
 ├── [8.1K]  PLAN.md
 ├── [ 16K]  README.md
@@ -36,18 +36,19 @@ globs:
 ├── [ 13K]  cleanup.py
 ├── [4.0K]  docs
 │   └── [6.6K]  architecture.md
+├── [535K]  llms.txt
 ├── [5.8K]  pyproject.toml
 ├── [4.0K]  src
 │   └── [4.0K]  twat_mp
 │       ├── [ 777]  __init__.py
 │       ├── [4.0K]  __pycache__
 │       ├── [ 17K]  async_mp.py
-│       └── [ 30K]  mp.py
+│       └── [ 28K]  mp.py
 ├── [4.0K]  tests
 │   ├── [4.0K]  __pycache__
 │   ├── [3.1K]  test_async_mp.py
 │   ├── [6.3K]  test_benchmark.py
-│   └── [ 13K]  test_twat_mp.py
+│   └── [ 14K]  test_twat_mp.py
 └── [239K]  uv.lock
 
-14 directories, 33 files
+14 directories, 34 files
