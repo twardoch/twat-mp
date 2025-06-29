@@ -1,502 +1,438 @@
-# twat-mp
+# twat-mp: Parallel Processing Utilities for Python
 
-Parallel processing utilities primarily using the Pathos library for robust synchronous operations. This package provides convenient context managers and decorators for process-based and thread-based parallelism. Support for asynchronous multiprocessing via `aiomultiprocess` is included but considered experimental for the current MVP and will be stabilized in future releases.
+`twat-mp` is a Python library designed to simplify parallel processing. It leverages the power of the [Pathos](https://pathos.readthedocs.io/en/latest/) library for robust synchronous parallel operations and offers experimental support for asynchronous parallelism using [aiomultiprocess](https://github.com/omnilib/aiomultiprocess). Whether you're dealing with CPU-bound computations or I/O-bound tasks, `twat-mp` provides convenient tools to help you write efficient, parallelized Python code.
+
+This project is part of the [**twat**](https://pypi.org/project/twat/) collection of Python utilities.
+
+## Who is it For?
+
+`twat-mp` is for Python developers who want to:
+- Speed up their applications by running tasks in parallel.
+- Utilize multiple CPU cores effectively for computationally intensive work.
+- Improve responsiveness of applications performing many I/O operations (e.g., network requests, file operations).
+- Write cleaner and more manageable parallel code using context managers and decorators.
+
+## Why is it Useful?
+
+- **Simplified Parallelism:** Abstracts away much of the boilerplate associated with Python's native multiprocessing.
+- **Performance Gains:** Enables significant speedups for suitable tasks by distributing work across multiple processes or threads.
+- **CPU and I/O Optimization:** Offers distinct tools (`ProcessPool` for CPU-bound, `ThreadPool` for I/O-bound) to best match your workload.
+- **Resource Management:** Automatic and reliable cleanup of parallel resources using context managers.
+- **Enhanced Error Handling:** Provides clearer error messages from worker processes, making debugging easier.
+- **Flexible Configuration:** Allows customization of worker counts, with sensible defaults based on system CPU cores.
+- **Modern Python:** Built with type hints and modern Python features.
 
 ## Features
 
-* Core parallel processing options using Pathos:
-  + `ProcessPool`: For CPU-intensive parallel processing.
-  + `ThreadPool`: For I/O-bound parallel processing.
-* Decorators for common synchronous parallel mapping operations:
-  + `pmap`: Standard parallel map (eager evaluation).
-  + `imap`: Lazy parallel map returning an iterator.
-  + `amap`: Asynchronous-style map with automatic result retrieval (uses synchronous Pathos pools).
-* Experimental Asynchronous Support (via `aiomultiprocess` - subject to stabilization):
-  + `AsyncMultiPool`: For combined async/await with multiprocessing. (*Experimental*)
-  + `apmap`: Async parallel map for use with async/await functions. (*Experimental*)
-* Automatic CPU core detection for optimal pool sizing.
-* Clean resource management with context managers.
-* Full type hints and modern Python features.
-* Flexible pool configuration with customizable worker count
-* Graceful error handling and resource cleanup
-* Enhanced exception propagation with detailed context
-* Debug mode with comprehensive logging
-* Optional dependencies to reduce installation footprint
-* Version control system (VCS) based versioning using hatch-vcs
-
-## Recent Updates
-
-* Added debug mode with detailed logging via `set_debug_mode()`
-* Enhanced error handling with `WorkerError` (previously `WorkerException`) for better context.
-* Improved exception propagation from worker processes.
-* Added comprehensive docstrings to all public functions and classes.
-* Fixed build system configuration with proper version handling.
-* Enhanced error handling and resource cleanup.
-* Added comprehensive API reference documentation.
-* Added real-world examples for various use cases.
+- **Synchronous Parallel Processing (Core):**
+    - `ProcessPool`: Context manager for CPU-intensive tasks, utilizing multiple processes.
+    - `ThreadPool`: Context manager for I/O-bound tasks, utilizing multiple threads.
+    - Decorators for common parallel mapping operations:
+        - `@pmap`: Standard parallel map (eager evaluation).
+        - `@imap`: Lazy parallel map, returning an iterator (memory-efficient).
+        - `@amap`: Asynchronous-style map that collects results (uses synchronous Pathos pools).
+- **Experimental Asynchronous Support (via `aiomultiprocess`):**
+    - `AsyncMultiPool`: Context manager for combining `async/await` with multiprocessing.
+    - `@apmap`: Decorator for applying `async` functions in parallel.
+- **Automatic CPU Core Detection:** Optimizes default pool sizes.
+- **Debug Mode:** Provides detailed logging for troubleshooting.
+- **Customizable Worker Count:** Flexibly configure the number of parallel workers.
+- **Enhanced Exception Propagation:** Clearer context for errors occurring in worker processes/threads.
 
 ## Installation
 
-Core (Synchronous) Installation:
+You can install `twat-mp` using pip:
+
+**Core Installation (Synchronous Features):**
 ```bash
 pip install twat-mp
 ```
 
-To include experimental async support (requires `aiomultiprocess`):
+**With Experimental Async Support:**
+To include the experimental asynchronous features (which require `aiomultiprocess`), install the `aio` extra:
 ```bash
 pip install 'twat-mp[aio]'
 ```
 
-With all extras and development tools:
+**With All Extras and Development Tools:**
 ```bash
 pip install 'twat-mp[all,dev]'
 ```
 
-## Usage
+## Basic Usage (Programmatic)
 
-### Basic Synchronous Usage
+`twat-mp` is a library and is used programmatically within your Python scripts.
 
-```python
-from twat_mp import ProcessPool, pmap
+### Synchronous Parallelism
 
-# Using the pool directly
-with ProcessPool() as pool:
-    results = pool.map(lambda x: x * 2, range(10))
-    print(list(results))
+#### Using `ProcessPool` for CPU-Bound Tasks
 
-# Using the decorator
-@pmap
-def double(x):
-    return x * 2
-
-results = list(double(range(10)))
-print(results)
-```
-
-### Async Support (Experimental - For Future Stabilization)
-
-**Note:** Async features are currently considered experimental due to potential environment-specific stability issues (e.g., test hangs). They are provided for early adopters and will be a focus for stabilization in future releases.
-
-The package includes experimental async support through `aiomultiprocess`, allowing you to combine the benefits of async/await with multiprocessing:
+Ideal for tasks that perform heavy computations.
 
 ```python
-import asyncio
-from twat_mp import AsyncMultiPool, apmap # Ensure 'aio' extra is installed
+from twat_mp import ProcessPool
 
-# Using the pool directly
-async def process_items_async():
-    # Note: Ensure AsyncMultiPool and apmap are imported if 'aio' extra is installed
-    # and you intend to use these experimental features.
-    # from twat_mp import AsyncMultiPool, apmap
-
-    async with AsyncMultiPool() as pool: # Experimental
-        async def work(x):
-            await asyncio.sleep(0.1)  # Some async work
-            return x * 2
-
-        results = await pool.map(work, range(10))
-        return results
-
-# Using the decorator
-@apmap # Experimental
-async def double_async(x):
-    await asyncio.sleep(0.1)  # Some async work
-    return x * 2
-
-async def main_async_example():
-    # results_items = await process_items_async()
-    # print(f"Async items processed: {results_items}")
-
-    results_decorated = await double_async(range(10))
-    print(f"Async decorated results: {results_decorated}") # [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
-
-# if __name__ == "__main__":
-# import asyncio
-# asyncio.run(main_async_example())
-```
-
-Async support can be useful for:
-- Performing CPU-intensive tasks in parallel within an async application.
-- Handling many concurrent I/O operations when combined with async patterns.
-- Processing results from async APIs in parallel.
-
-### Advanced Async Features (Experimental)
-
-The `AsyncMultiPool` (experimental) provides additional methods for different mapping strategies:
-
-```python
-import asyncio
-# from twat_mp import AsyncMultiPool # Ensure 'aio' extra
-
-async def main_advanced_async():
-    # Note: Ensure AsyncMultiPool is imported if 'aio' extra is installed
-    # and you intend to use these experimental features.
-    from twat_mp import AsyncMultiPool
-
-    # Using starmap for unpacking arguments
-    async def sum_values(a, b):
-        await asyncio.sleep(0.01)
-        return a + b
-
-    async with AsyncMultiPool() as pool: # Experimental
-        # Regular map
-        double_results = await pool.map(
-            lambda x: x * 2,
-            range(5)
-        )
-        print(f"Async map results: {double_results}")  # [0, 2, 4, 6, 8]
-
-        # Starmap unpacks arguments
-        sum_results = await pool.starmap(
-            sum_values,
-            [(1, 2), (3, 4), (5, 6)]
-        )
-        print(f"Async starmap results: {sum_results}")  # [3, 7, 11]
-
-        # imap returns an async iterator
-        print("Async imap results:")
-        async for result in pool.imap(lambda x: x*x, range(3)): # Example with a simple lambda
-            print(result)  # Prints 0, 1, 4 as they complete
-
-# if __name__ == "__main__":
-# import asyncio
-# asyncio.run(main_advanced_async())
-```
-
-### Using Process and Thread Pools (Core MVP Feature)
-
-The package provides dedicated context managers for robust synchronous parallel processing:
-
-```python
-from twat_mp import ProcessPool, ThreadPool
-
-# For CPU-intensive operations
-with ProcessPool() as pool:
-    results = pool.map(lambda x: x * x, range(10))
-    print(list(results))  # Expected: [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
-
-# For I/O-bound operations
-with ThreadPool() as pool:
-    results = pool.map(lambda x: x * 2, range(10))
-    print(list(results))  # Expected: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
-
-# Custom number of workers
-with ProcessPool(nodes=4) as pool:
-    results = pool.map(lambda x: x * x, range(10))
-    print(list(results))
-```
-
-### Using Synchronous Map Decorators (Core MVP Feature)
-
-The package provides three decorators for different synchronous mapping strategies using Pathos pools:
-
-```python
-from twat_mp import amap, imap, pmap # These are synchronous for MVP
-
-# Standard parallel map (eager evaluation)
-@pmap
-def square(x: int) -> int:
+def calculate_square(x):
+    # Simulate a CPU-intensive calculation
+    # In a real scenario, this would be actual computation
+    result = 0
+    for _ in range(x * 10000): # Ensure this is not too small to see effect
+        result +=1
     return x * x
 
-results = list(square(range(10)))
-print(results)  # [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
-
-# Lazy parallel map (returns iterator)
-@imap
-def cube(x: int) -> int:
-    return x * x * x
-
-for result in cube(range(5)):
-    print(result)  # Prints results as they become available
-
-# Asynchronous parallel map with automatic result retrieval
-@amap
-def double(x: int) -> int:
-    return x * 2
-
-results = list(double(range(10)))
-print(results)  # [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
-```
-
-### Function Composition
-
-Decorators can be composed for complex parallel operations:
-
-```python
-from twat_mp import amap
-
-@amap
-def compute_intensive(x: int) -> int:
-    result = x
-    for _ in range(1000):  # Simulate CPU-intensive work
-        result = (result * x + x) % 10000
-    return result
-
-@amap
-def io_intensive(x: int) -> int:
-    import time
-    time.sleep(0.001)  # Simulate I/O wait
-    return x * 2
-
-# Chain parallel operations
-results = list(io_intensive(compute_intensive(range(100))))
-```
-
-### Debug Mode and Error Handling
-
-The package provides a debug mode for detailed logging and enhanced error handling:
-
-```python
-from twat_mp import ProcessPool, set_debug_mode
-import time
-import random
-
-def process_item(x):
-    """Process an item with random delay and potential errors."""
-    # Simulate random processing time
-    time.sleep(random.random() * 0.5)
-    
-    # Randomly fail for demonstration
-    if random.random() < 0.2:  # 20% chance of failure
-        raise ValueError(f"Random failure processing item {x}")
-        
-    return x * 10
-
-# Enable debug mode for detailed logging
-set_debug_mode(True)
-
-try:
+if __name__ == "__main__":
     with ProcessPool() as pool:
-        results = list(pool.map(process_item, range(10)))
-        print(f"Processed results: {results}")
-except Exception as e:
-    print(f"Caught exception: {e}")
-    # The exception will include details about which worker and input item caused the error
-finally:
-    # Disable debug mode when done
-    set_debug_mode(False)
+        numbers = range(10)
+        results = pool.map(calculate_square, numbers)
+        print(f"Squares: {list(results)}")
+        # Expected (order may vary if not collected into a list immediately for some pool methods):
+        # Squares: [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
 ```
 
-The enhanced error handling provides detailed context about failures:
+#### Using `ThreadPool` for I/O-Bound Tasks
+
+Suitable for tasks that spend time waiting for external operations like network requests or file I/O.
 
 ```python
-from twat_mp import ProcessPool
-
-def risky_function(x):
-    if x == 5:
-        raise ValueError("Cannot process item 5")
-    return x * 2
-
-try:
-    with ProcessPool() as pool:
-        results = list(pool.map(risky_function, range(10)))
-except ValueError as e:
-    # The exception will include the worker ID and input item that caused the error
-    print(f"Caught error: {e}")
-    # Handle the error appropriately
-```
-
-## Real-World Examples
-
-### Image Processing
-
-Processing images in parallel can significantly speed up operations like resizing, filtering, or format conversion:
-
-```python
-from twat_mp import ProcessPool
-from PIL import Image
-import os
-
-def resize_image(file_path):
-    """Resize an image to 50% of its original size."""
-    try:
-        with Image.open(file_path) as img:
-            # Get the original size
-            width, height = img.size
-            # Resize to 50%
-            resized = img.resize((width // 2, height // 2))
-            # Save with '_resized' suffix
-            output_path = os.path.splitext(file_path)[0] + '_resized' + os.path.splitext(file_path)[1]
-            resized.save(output_path)
-            return output_path
-    except Exception as e:
-        return f"Error processing {file_path}: {e}"
-
-# Get all image files in a directory
-image_files = [f for f in os.listdir('images') if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
-image_paths = [os.path.join('images', f) for f in image_files]
-
-# Process images in parallel
-with ProcessPool() as pool:
-    results = list(pool.map(resize_image, image_paths))
-
-print(f"Processed {len(results)} images")
-```
-
-### Web Scraping
-
-Thread pools are ideal for I/O-bound operations like web scraping:
-
-```python
-import requests
-from bs4 import BeautifulSoup
 from twat_mp import ThreadPool
+import time
+import requests # Make sure to install: pip install requests
 
-def fetch_page_title(url):
-    """Fetch the title of a webpage."""
+def fetch_url_status(url):
     try:
-        response = requests.get(url, timeout=10)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.text, 'html.parser')
-        title = soup.title.string if soup.title else "No title found"
-        return {"url": url, "title": title, "status": response.status_code}
-    except Exception as e:
-        return {"url": url, "error": str(e), "status": None}
+        response = requests.get(url, timeout=5)
+        return url, response.status_code
+    except requests.RequestException as e:
+        return url, str(e)
 
-# List of URLs to scrape
-urls = [
-    "https://www.python.org",
-    "https://www.github.com",
-    "https://www.stackoverflow.com",
-    "https://www.wikipedia.org",
-    "https://www.reddit.com"
-]
-
-# Use ThreadPool for I/O-bound operations
-with ThreadPool() as pool:
-    results = list(pool.map(fetch_page_title, urls))
-
-# Print results
-for result in results:
-    if "error" in result:
-        print(f"Error fetching {result['url']}: {result['error']}")
-    else:
-        print(f"{result['url']} - {result['title']} (Status: {result['status']})")
+if __name__ == "__main__":
+    urls = [
+        "https://www.python.org",
+        "https://www.github.com",
+        "https://nonexistent.example.com" # Example of a failing URL
+    ]
+    with ThreadPool(nodes=len(urls)) as pool: # Using more threads for I/O
+        results = pool.map(fetch_url_status, urls)
+        for url, status in results:
+            print(f"Status for {url}: {status}")
 ```
 
-### Data Processing with Pandas
+#### Using Synchronous Decorators
 
-Process large datasets in parallel chunks:
+Decorators provide a concise way to parallelize functions.
 
 ```python
-import pandas as pd
-import numpy as np
-from twat_mp import ProcessPool
+from twat_mp import pmap, imap, amap
+import time
 
-def process_chunk(chunk_data):
-    """Process a chunk of data."""
-    # Simulate some data processing
-    chunk_data['processed'] = chunk_data['value'] * 2 + np.random.randn(len(chunk_data))
-    chunk_data['category'] = pd.cut(chunk_data['processed'], 
-                                    bins=[-np.inf, 0, 10, np.inf], 
-                                    labels=['low', 'medium', 'high'])
-    # Calculate some statistics
-    result = {
-        'chunk_id': chunk_data['chunk_id'].iloc[0],
-        'mean': chunk_data['processed'].mean(),
-        'median': chunk_data['processed'].median(),
-        'std': chunk_data['processed'].std(),
-        'count': len(chunk_data),
-        'categories': chunk_data['category'].value_counts().to_dict()
-    }
-    return result
+# @pmap: Eager parallel map
+@pmap
+def process_data_pmap(item):
+    # print(f"pmap processing {item}")
+    time.sleep(0.01) # Simulate work
+    return item * 2
 
-# Create a large DataFrame
-n_rows = 1_000_000
-df = pd.DataFrame({
-    'value': np.random.randn(n_rows),
-    'group': np.random.choice(['A', 'B', 'C', 'D'], n_rows)
-})
+# @imap: Lazy parallel map (results as an iterator)
+@imap
+def process_data_imap(item):
+    # print(f"imap processing {item}")
+    time.sleep(0.01) # Simulate work
+    return item * 3
 
-# Split into chunks for parallel processing
-chunk_size = 100_000
-chunks = []
-for i, chunk_start in enumerate(range(0, n_rows, chunk_size)):
-    chunk_end = min(chunk_start + chunk_size, n_rows)
-    chunk = df.iloc[chunk_start:chunk_end].copy()
-    chunk['chunk_id'] = i
-    chunks.append(chunk)
+# @amap: Asynchronous-style map (collects all results)
+@amap
+def process_data_amap(item):
+    # print(f"amap processing {item}")
+    time.sleep(0.01) # Simulate work
+    return item * 4
 
-# Process chunks in parallel
-with ProcessPool() as pool:
-    results = list(pool.map(process_chunk, chunks))
+if __name__ == "__main__":
+    data = range(5)
 
-# Combine results
-summary = pd.DataFrame(results)
-print(summary)
+    print("pmap results:", list(process_data_pmap(data)))
+    # Expected: pmap results: [0, 2, 4, 6, 8]
+
+    print("imap results:")
+    for res_imap in process_data_imap(data):
+        print(res_imap, end=" ") # 0 3 6 9 12
+    print()
+
+    print("amap results:", list(process_data_amap(data)))
+    # Expected: amap results: [0, 4, 8, 12, 16]
 ```
 
-### Async File Processing (Experimental)
+### Experimental Asynchronous Parallelism
 
-This example demonstrates combining async I/O with the experimental `AsyncMultiPool`.
+**Note:** These features are experimental and require `aiomultiprocess` (`pip install 'twat-mp[aio]'`). Their API and behavior might change in future releases.
+
+#### Using `AsyncMultiPool`
+
+Combines `async/await` with multiprocessing.
 
 ```python
 import asyncio
-import os
-# import aiofiles # Requires separate installation: pip install aiofiles
-# from twat_mp import AsyncMultiPool # Ensure 'aio' extra
+from twat_mp import AsyncMultiPool # Requires 'aio' extra
 
-async def count_words_async(filename):
-    """Count words in a file asynchronously."""
-    # Note: aiofiles needs to be installed separately.
-    # This example is illustrative of how AsyncMultiPool could be used.
+async def async_work(x):
+    await asyncio.sleep(0.1)  # Simulate async I/O or CPU work in an async context
+    return x * 2
+
+async def main_async_pool():
+    # Ensure AsyncMultiPool is imported if 'aio' extra is installed
+    # and you intend to use these experimental features.
+    # from twat_mp import AsyncMultiPool
+
+    async with AsyncMultiPool() as pool: # Experimental
+        results = await pool.map(async_work, range(5))
+        print(f"AsyncMultiPool results: {results}")
+        # Expected: AsyncMultiPool results: [0, 2, 4, 6, 8]
+
+if __name__ == "__main__":
+    # To run this example, ensure 'aio' extra is installed.
+    # You might need to check if AsyncMultiPool is available due to its optional dependency.
     try:
-        # Placeholder for async file reading logic
-        # async with aiofiles.open(filename, 'r') as f:
-        #     content = await f.read()
-        #     word_count = len(content.split())
-        # return {"filename": filename, "word_count": word_count}
-        await asyncio.sleep(0.01) # Simulate async read
-        return {"filename": filename, "word_count": len(filename) * 5} # Dummy result
-    except Exception as e:
-        return {"filename": filename, "error": str(e)}
+        from twat_mp import AsyncMultiPool
+        asyncio.run(main_async_pool())
+    except ImportError:
+        print("Async features not available. Install with 'pip install \"twat-mp[aio]\"'")
+    except RuntimeError as e:
+        print(f"Async example runtime error: {e}") # Handles test hangs etc.
 
-async def main_async_files():
-    # from twat_mp import AsyncMultiPool # Ensure 'aio' extra
-    # Create dummy files for example if needed, or use existing text files
-    # For real use, ensure 'documents' directory exists and has .txt files
-    script_dir = os.path.dirname(__file__) if "__file__" in locals() else "."
-    doc_dir = os.path.join(script_dir, "documents_example")
-    os.makedirs(doc_dir, exist_ok=True)
-    if not os.listdir(doc_dir): # Create dummy files if dir is empty
-        for i in range(3):
-            with open(os.path.join(doc_dir, f"file{i}.txt"), "w") as f:
-                f.write(f"This is dummy file {i} with some words.")
-
-    files = [os.path.join(doc_dir, f) for f in os.listdir(doc_dir)
-             if f.endswith(".txt")]
-
-    if not files:
-        print("No .txt files found in documents_example directory for async processing example.")
-        return
-
-    # Placeholder for AsyncMultiPool usage
-    # async with AsyncMultiPool() as pool: # Experimental
-    # results = await pool.map(count_words_async, files)
-    
-    # Simulating results for now as AsyncMultiPool is experimental
-    results = [await count_words_async(f) for f in files]
-
-
-    total_words = sum(r.get("word_count", 0) for r in results if "error" not in r)
-    
-    print("\nAsync File Processing Results (Experimental):")
-    for result in results:
-        if "error" in result:
-            print(f"Error processing {result['filename']}: {result['error']}")
-        else:
-            print(f"{result['filename']}: {result['word_count']} words")
-    print(f"Total word count (simulated): {total_words}")
-
-# if __name__ == "__main__":
-# import asyncio
-# asyncio.run(main_async_files())
 ```
+
+#### Using `@apmap` Decorator (Experimental)
+
+```python
+import asyncio
+from twat_mp import apmap # Requires 'aio' extra
+
+@apmap # Experimental
+async def double_async_apmap(x):
+    await asyncio.sleep(0.1)  # Simulate async work
+    return x * 2
+
+async def main_apmap_example():
+    results = await double_async_apmap(range(5))
+    print(f"apmap decorated results: {results}")
+    # Expected: apmap decorated results: [0, 2, 4, 6, 8]
+
+if __name__ == "__main__":
+    # To run this example, ensure 'aio' extra is installed.
+    try:
+        from twat_mp import apmap
+        asyncio.run(main_apmap_example())
+    except ImportError:
+        print("Async features not available. Install with 'pip install \"twat-mp[aio]\"'")
+    except RuntimeError as e:
+        print(f"Async example runtime error: {e}")
+```
+
+## Real-World Examples (Conceptual)
+
+### Image Processing (CPU-Bound)
+```python
+# Conceptual example for parallel image resizing
+from twat_mp import ProcessPool
+# from PIL import Image # Requires: pip install Pillow
+import os
+
+def resize_image(image_path):
+    # Placeholder for actual image processing
+    # print(f"Resizing {image_path}...")
+    # with Image.open(image_path) as img:
+    #     resized_img = img.resize((img.width // 2, img.height // 2))
+    #     # save resized_img
+    time.sleep(0.1) # Simulate work
+    return f"Resized {os.path.basename(image_path)}"
+
+if __name__ == "__main__":
+    # Create dummy image files for the example
+    # os.makedirs("dummy_images", exist_ok=True)
+    # image_files = []
+    # for i in range(5):
+    #     fp = f"dummy_images/image_{i}.png"
+    #     # with open(fp, "w") as f: f.write("dummy") # Create placeholder
+    #     image_files.append(fp)
+
+    # Assuming image_files is a list of paths to image files
+    image_files = [f"image_{i}.png" for i in range(5)] # Dummy list
+
+    if image_files:
+        with ProcessPool() as pool:
+            results = pool.map(resize_image, image_files)
+            for r in results:
+                print(r)
+    else:
+        print("No image files to process for example.")
+```
+
+### Web Scraping (I/O-Bound)
+```python
+# Conceptual example for parallel web scraping
+from twat_mp import ThreadPool
+import requests
+# from bs4 import BeautifulSoup # Requires: pip install beautifulsoup4
+
+def fetch_page_title(url):
+    try:
+        # print(f"Fetching {url}...")
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        # soup = BeautifulSoup(response.text, 'html.parser')
+        # title = soup.title.string if soup.title else "No title"
+        time.sleep(0.1) # Simulate network latency and parsing
+        return f"Title for {url}: Fetched (simulated)"
+    except requests.RequestException as e:
+        return f"Error fetching {url}: {e}"
+
+if __name__ == "__main__":
+    urls_to_scrape = [
+        "https://www.python.org",
+        "https://www.github.com",
+        "https://www.djangoproject.com",
+    ]
+    with ThreadPool(nodes=len(urls_to_scrape)) as pool:
+        results = pool.map(fetch_page_title, urls_to_scrape)
+        for r in results:
+            print(r)
+```
+
+---
+
+## Technical Details
+
+### How the Code Works
+
+#### Synchronous Components (`src/twat_mp/mp.py`)
+
+The synchronous part of `twat-mp` is built around the Pathos library.
+
+- **`MultiPool`**: This is the base context manager class.
+    - It handles the creation and cleanup of Pathos pools (`PathosProcessPool` or `PathosThreadPool`).
+    - If the number of `nodes` (workers) isn't specified, it defaults to the system's CPU count using `pathos.helpers.mp.cpu_count()`.
+    - Upon entering the context (`__enter__`), it instantiates the specified Pathos pool.
+    - Crucially, it patches the pool's `map` method to use `_worker_wrapper`. This ensures that any exceptions from worker functions are caught and wrapped in a `WorkerError`.
+    - On exiting (`__exit__`), it ensures the pool is properly closed, joined, and cleared, handling `KeyboardInterrupt` for quicker termination.
+
+- **`ProcessPool` & `ThreadPool`**: These are subclasses of `MultiPool` that default to using `PathosProcessPool` and `PathosThreadPool` respectively. They are the primary context managers for users.
+
+- **`_worker_wrapper(func, item, worker_id)`**:
+    - This internal function wraps the user's target function (`func`) that is executed in a worker.
+    - If `func(item)` executes successfully, its result is returned.
+    - If `func(item)` raises an exception, `_worker_wrapper` catches it, logs the error and traceback (if debug mode is on), and then re-raises it as a `WorkerError`. This custom exception includes the original exception, the input `item` that caused the failure, an optional `worker_id` (typically the item's index), and the traceback string.
+
+- **`WorkerError`**:
+    - A custom exception class inheriting from `Exception`.
+    - It's designed to provide more context about errors occurring in worker processes/threads, bundling the original exception, the problematic input, and traceback.
+
+- **`mmap(how, get_result=False, debug=None)`**: This is a decorator factory.
+    - It's not directly used by end-users but is the engine behind `@pmap`, `@imap`, and `@amap`.
+    - The `how` argument specifies the Pathos mapping method to use:
+        - `'map'`: Standard eager evaluation (used by `@pmap`).
+        - `'imap'`: Lazy evaluation, returns an iterator (used by `@imap`).
+        - `'amap'`: Asynchronous-style map; Pathos's `amap` returns a future-like object.
+    - The `get_result=True` parameter (used by `@amap`) means the decorator will automatically call `.get()` on the result of Pathos's `amap` to retrieve the computed values.
+    - The factory returns a decorator, which in turn wraps the user's function. When the decorated function is called with an iterable, it internally creates a `MultiPool` (defaulting to `ProcessPool`), gets the specified mapping method from the pool, and applies it to the user's function and iterable.
+    - It handles `WorkerError` propagation: if a `WorkerError` is caught, it attempts to re-raise the `original_exception` for a more natural error flow for the user.
+
+- **`set_debug_mode(enabled: bool)`**:
+    - A global function to enable or disable `DEBUG_MODE`.
+    - When enabled, it configures logging to `DEBUG` level, providing detailed output about pool creation, task execution, and cleanup.
+
+#### Experimental Asynchronous Components (`src/twat_mp/async_mp.py`)
+
+These components rely on the `aiomultiprocess` library and are marked as experimental.
+
+- **`_check_aiomultiprocess()`**: A utility function that raises an `ImportError` if `aiomultiprocess` is not installed, guiding the user to install it via `pip install 'twat-mp[aio]'`.
+
+- **`AsyncMultiPool`**: An asynchronous context manager.
+    - On `__aenter__`, it creates an `aiomultiprocess.Pool` instance. Users can specify the number of `processes`, an `initializer` function for workers, and `initargs`.
+    - It provides `async` methods:
+        - `map(func, iterable)`: Applies an `async` function `func` to each item in `iterable` in parallel.
+        - `starmap(func, iterable)`: Similar to `map`, but unpacks argument tuples from `iterable`.
+        - `imap(func, iterable)`: Returns an async iterator that yields results as they complete.
+    - On `__aexit__`, it handles the shutdown of the `aiomultiprocess.Pool` gracefully (close, join) with a fallback to terminate if necessary. It also includes robust error handling during cleanup.
+
+- **`@apmap` Decorator**:
+    - An `async` decorator for `async` functions.
+    - When the decorated `async` function is called with an iterable, `@apmap` internally creates an `AsyncMultiPool` and uses its `map` method to execute the function calls in parallel.
+    - It simplifies the pattern of setting up and tearing down an `AsyncMultiPool` for a single parallel map operation.
+
+#### Error Handling Strategy
+
+- **Synchronous:** Worker exceptions are caught by `_worker_wrapper` and re-raised as `WorkerError`. The `mmap` decorator factory then catches `WorkerError` and typically re-raises the `original_exception` contained within it. This makes the error handling feel more direct to the user.
+- **Asynchronous (Experimental):** Errors within `aiomultiprocess` tasks are generally propagated by `aiomultiprocess` itself. `AsyncMultiPool` and `@apmap` wrap calls to `aiomultiprocess` methods and may raise `RuntimeError` for issues during pool operations or if `aiomultiprocess` itself raises an error that isn't more specific.
+
+#### Resource Management
+
+- The primary mechanism for resource management is the use of context managers:
+    - `with ProcessPool() as pool:` / `with ThreadPool() as pool:`
+    - `async with AsyncMultiPool() as pool:` (Experimental)
+- The `__exit__` and `__aexit__` methods of these context managers are responsible for ensuring that underlying pools (Pathos or aiomultiprocess) are properly closed, worker processes/threads are joined, and resources are released. This happens automatically, even if errors occur within the `with` block.
+
+### Coding and Contribution Rules
+
+We encourage contributions to `twat-mp`! Please follow these guidelines:
+
+#### Conventions
+
+- **Formatting:** Code is formatted using [Ruff](https://github.com/astral-sh/ruff) (which includes Black-compatible formatting). Key settings (from `pyproject.toml`):
+    - `line-length = 88`
+    - `quote-style = "double"`
+    - `indent-style = "space"`
+- **Linting:** Ruff is also used for linting, with an extended set of rules (`I` for isort, `N` for pep8-naming, `B` for flake8-bugbear, `RUF` for Ruff-specific rules). See `pyproject.toml` for specific ignored rules.
+- **Typing:** The project uses type hints and is checked with [MyPy](http://mypy-lang.org/). Stricter MyPy options are enabled (e.g., `disallow_untyped_defs`, `no_implicit_optional`).
+
+#### Testing
+
+- Tests are written using [Pytest](https://docs.pytest.org/).
+- **Running Tests:**
+    - Core synchronous tests: `hatch run test:test` (runs tests in parallel, ignores async tests).
+    - To run specific tests or with coverage: `hatch run test:test-cov`.
+    - Asynchronous tests (require `[aio]` extra) are typically in `tests/test_async_mp.py` and can be run specifically if needed, e.g., `pytest tests/test_async_mp.py`. Project configuration aims to skip these by default if `aiomultiprocess` is not available or if explicitly excluded.
+- **Benchmarks:** Performance benchmarks use `pytest-benchmark`. Run with `hatch run test:bench`.
+- New features should include corresponding tests. Bug fixes should ideally include a test that reproduces the bug.
+
+#### Dependencies
+
+- **Core:** `pathos` is a core dependency.
+- **Optional:** `aiomultiprocess` is an optional dependency, required for the experimental async features. It's managed via the `[aio]` extra in `pyproject.toml`.
+- Development dependencies (linters, testing tools) are listed under `[project.optional-dependencies]` (e.g., `test`, `dev`).
+
+#### Versioning
+
+- Versioning is managed by `hatch-vcs`, which derives the project version from Git tags.
+
+#### Contribution Process
+
+1. **Fork the repository** on GitHub.
+2. **Create a new branch** for your feature or bug fix: `git checkout -b feature/your-feature-name` or `bugfix/issue-description`.
+3. **Make your changes.** Ensure you add tests and update documentation if necessary.
+4. **Run linters and tests** locally to ensure everything passes:
+   ```bash
+   hatch run lint:all
+   hatch run test:test
+   hatch run test:test-cov
+   ```
+5. **Commit your changes** with clear and descriptive commit messages.
+6. **Push your branch** to your fork: `git push origin feature/your-feature-name`.
+7. **Open a Pull Request (PR)** against the `main` branch of the `twardoch/twat-mp` repository.
+8. Clearly describe your changes in the PR. Link to any relevant issues.
+
+#### Project Structure
+
+- `src/twat_mp/`: Main source code for the library.
+    - `mp.py`: Synchronous multiprocessing components.
+    - `async_mp.py`: Experimental asynchronous multiprocessing components.
+- `tests/`: Pytest tests.
+- `docs/`: Additional documentation (like `architecture.md`).
+- `pyproject.toml`: Project metadata, dependencies, and tool configurations.
+- `README.md`: This file.
 
 ## API Reference
 
-For detailed API documentation, see the [API Reference](API_REFERENCE.md).
+For detailed API documentation of all classes, methods, and functions, please see the [API Reference (API_REFERENCE.md)](API_REFERENCE.md).
 
 ## License
 
-MIT
+`twat-mp` is licensed under the [MIT License](LICENSE).
