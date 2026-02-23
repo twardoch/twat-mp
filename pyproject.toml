@@ -76,6 +76,12 @@ aio = [
     "aiomultiprocess>=0.9.1" # For asynchronous multiprocessing features
 ]
 dev = ["pre-commit>=3.6.0"]
+
+docs = [
+    "mkdocs>=1.6.0",
+    "mkdocs-material>=9.5.0",
+    "mkdocstrings[python]>=0.27.0",
+]
 all = [
     "twat>=1.0.0",
     "pathos>=0.3.3",
@@ -108,25 +114,68 @@ all = ["style", "typing"]
 
 [tool.ruff]
 target-version = "py310"
-line-length = 88
-lint.extend-select = [
-    "I", # isort
-    "N", # pep8-naming
-    "B", # flake8-bugbear
-    "RUF", # Ruff-specific rules
-
-]
-lint.ignore = [
-    "ARG001", # Unused function argument
-    "E501", # Line too long
-    "I001",
-]
-
+line-length = 120
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "lf"
+
+[tool.ruff.lint]
+select = [
+    "A",
+    "ARG",
+    "B",
+    "C",
+    "DTZ",
+    "E",
+    "EM",
+    "F",
+    "FBT",
+    "I",
+    "ICN",
+    "ISC",
+    "N",
+    "PLC",
+    "PLE",
+    "PLR",
+    "PLW",
+    "Q",
+    "RUF",
+    "S",
+    "T",
+    "TID",
+    "UP",
+    "W",
+    "YTT",
+]
+ignore = [
+    "ARG001",
+    "ARG002",
+    "ARG004",
+    "ARG005",
+    "B904",
+    "C901",
+    "DTZ005",
+    "E501",
+    "F401",
+    "F811",
+    "FBT001",
+    "FBT002",
+    "FBT003",
+    "I001",
+    "ISC001",
+    "N803",
+    "PLR0911",
+    "PLR0912",
+    "PLR0913",
+    "PLR0915",
+    "PLR2004",
+    "S311",
+    "S603",
+    "S607",
+    "T201",
+]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101"]
@@ -159,7 +208,14 @@ warn_no_return = true
 warn_unreachable = true
 
 [tool.pytest.ini_options]
-markers = ["benchmark: marks tests as benchmarks (select with '-m benchmark')"]
+markers = [
+    "benchmark: marks tests as benchmarks (select with '-m benchmark')",
+    "unit: mark a test as a unit test",
+    "integration: mark a test as an integration test",
+    "slow: marks tests as slow (select with '-m slow')",
+    "online: marks tests that require internet access",
+    "requires_api_key: marks tests that require API keys",
+]
 addopts = "-v -p no:briefcase"
 testpaths = ["tests"]
 python_files = ["test_*.py"]
@@ -187,3 +243,9 @@ compare = [
 
 [tool.hatch.version]
 source = "vcs"
+
+[tool.hatch.version.raw-options]
+version_scheme = "post-release"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/twat_mp/__version__.py"
