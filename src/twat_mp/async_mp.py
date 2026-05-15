@@ -239,9 +239,7 @@ class AsyncMultiPool:
 
         # Log if we're cleaning up due to an exception
         if exc_type:
-            logger.warning(
-                f"Cleaning up pool after exception: {exc_type.__name__}: {exc_val}"
-            )
+            logger.warning(f"Cleaning up pool after exception: {exc_type.__name__}: {exc_val}")
 
         try:
             # Step 1: Try graceful shutdown first
@@ -277,9 +275,7 @@ class AsyncMultiPool:
             logger.error(error_msg)
             raise RuntimeError(error_msg) from cleanup_error
 
-    async def map(
-        self, func: Callable[[T], Awaitable[U]], iterable: Iterable[T]
-    ) -> list[U]:
+    async def map(self, func: Callable[[T], Awaitable[U]], iterable: Iterable[T]) -> list[U]:
         """
         Apply the function to each item in the iterable in parallel.
 
@@ -368,9 +364,7 @@ class AsyncMultiPool:
             logger.error(f"Error during parallel starmap operation: {e}")
             raise RuntimeError(f"Error during parallel starmap operation: {e}") from e
 
-    async def imap(
-        self, func: Callable[[T], Awaitable[U]], iterable: Iterable[T]
-    ) -> AsyncIterator[U]:
+    async def imap(self, func: Callable[[T], Awaitable[U]], iterable: Iterable[T]) -> AsyncIterator[U]:
         """
         Async iterator version of map().
 

@@ -1,38 +1,48 @@
-"""
-twat-mp - Parallel processing utilities for twat using pathos and aiomultiprocess.
-"""
+"""twat-mp: Parallel processing utilities for twat using pathos and aiomultiprocess."""
+
+from __future__ import annotations
+
+from importlib.metadata import PackageNotFoundError, version
+
+try:
+    __version__ = version("twat-mp")
+except PackageNotFoundError:
+    __version__ = "0.0.0-dev"
 
 from twat_mp.mp import (
     MultiPool,
     ProcessPool,
     ThreadPool,
+    WorkerError,
     amap,
     imap,
     mmap,
     pmap,
     set_debug_mode,
-    WorkerError,
 )
 
 # TODO: MVP Isolation - Async features temporarily disabled due to test environment hangs.
 # from twat_mp.async_mp import AsyncMultiPool, apmap
 
-try:
-    from twat_mp.__version__ import __version__
-except ImportError:
-    __version__ = "0.0.0"
+
+def main() -> None:
+    """CLI entry point for twat-mp."""
+    from twat_mp.__main__ import main as cli_main
+
+    cli_main()
 
 
 __all__ = [
-    # "AsyncMultiPool", # Temporarily disabled for MVP
+    # "AsyncMultiPool",  # Temporarily disabled for MVP
     "MultiPool",
     "ProcessPool",
     "ThreadPool",
     "WorkerError",
     "__version__",
     "amap",
-    # "apmap",          # Temporarily disabled for MVP
+    # "apmap",           # Temporarily disabled for MVP
     "imap",
+    "main",
     "mmap",
     "pmap",
     "set_debug_mode",

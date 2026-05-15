@@ -257,3 +257,4 @@ _private
 # Generated files from cleanup.py
 CLEANUP.txt
 REPO_CONTENT.txt
+ruvector.db

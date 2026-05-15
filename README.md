@@ -62,6 +62,13 @@ pip install 'twat-mp[all,dev]'
 ## Basic Usage (Programmatic)
 
 `twat-mp` is a library and is used programmatically within your Python scripts.
+It also registers as the `mp` plugin for the `twat` host and exposes a lightweight CLI smoke-test surface:
+
+```bash
+python -m twat_mp
+twat-mp
+twat mp
+```
 
 ### Synchronous Parallelism
 

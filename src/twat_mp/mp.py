@@ -1,23 +1,48 @@
 """
 Parallel processing utilities using the Pathos multiprocessing library.
 
-This module provides convenient context managers for creating and managing
-parallel processing pools (process or thread based) and decorators for applying
-parallel map operations to functions. It uses Pathos pools under the hood,
-automatically determining the optimal number of processes/threads based on the
-system's CPU count if not specified.
+Parallel vs. concurrent — a quick primer
+-----------------------------------------
+*Parallel* execution runs code on multiple CPU cores at the same time
+(true simultaneous computation).  *Concurrent* execution interleaves tasks
+on one core, switching between them while waiting on I/O.
 
-Example usage:
-    >>> from mp import pmap, imap, amap, ProcessPool, ThreadPool
-    >>>
-    >>> # Using the parallel map decorator (synchronous mapping)
-    >>> @pmap
-    ... def square(x: int) -> int:
-    ...     return x * x
-    >>>
-    >>> results = list(square(range(10)))
-    >>> print(results)
-    [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+Python's *Global Interpreter Lock* (GIL) prevents threads from running Python
+bytecode in parallel, so:
+
+* **CPU-bound work** (number crunching, image processing) → use
+  :class:`ProcessPool` which spawns separate OS processes and bypasses the GIL.
+* **I/O-bound work** (network requests, file reads) → use :class:`ThreadPool`
+  which is lighter and avoids the serialisation overhead of pickling data
+  across process boundaries.
+
+When to use ``twat-mp``
+------------------------
+When you have a list of independent items and a function to apply to each one,
+the decorator API lets you parallelise with a single line::
+
+    from twat_mp import pmap
+
+    @pmap                       # each call runs in a separate process
+    def resize_image(path: str) -> str:
+        ...                     # expensive PIL operation
+        return output_path
+
+    results = list(resize_image(image_paths))   # processed in parallel
+
+Pool context managers give direct access to Pathos pool methods::
+
+    from twat_mp import ProcessPool
+
+    with ProcessPool(nodes=4) as pool:
+        squares = pool.map(lambda x: x**2, range(100))
+
+Decorator variants
+------------------
+``pmap``  — eager parallel map; returns a list.
+``imap``  — lazy parallel map; returns an iterator (memory-efficient for large inputs).
+``amap``  — submits all work asynchronously then blocks for results via ``.get()``.
+``mmap``  — factory for custom map strategies (``'map'``, ``'imap'``, ``'amap'``).
 """
 
 from __future__ import annotations
@@ -102,9 +127,7 @@ class WorkerError(Exception):
         if input_item is not None:
             detailed_message += f" while processing {input_item!r}"
         if original_exception is not None:
-            detailed_message += (
-                f": {type(original_exception).__name__}: {original_exception}"
-            )
+            detailed_message += f": {type(original_exception).__name__}: {original_exception}"
 
         super().__init__(detailed_message)
 
@@ -163,9 +186,7 @@ def _worker_wrapper(func: Callable[[T], U], item: T, worker_id: int | None = Non
     except Exception as e:
         # Capture the traceback
         tb_str = traceback.format_exc()
-        logger.error(
-            f"Error in worker {worker_id if worker_id is not None else 'unknown'}: {e}"
-        )
+        logger.error(f"Error in worker {worker_id if worker_id is not None else 'unknown'}: {e}")
         logger.debug(f"Traceback: {tb_str}")
 
         # Wrap the exception with additional context
@@ -223,10 +244,7 @@ class MultiPool:
         self.debug = DEBUG_MODE if debug is None else debug
 
         if self.debug:
-            logger.debug(
-                f"Initializing {self.__class__.__name__} with {self.pool_class.__name__}, "
-                f"nodes={self.nodes}"
-            )
+            logger.debug(f"Initializing {self.__class__.__name__} with {self.pool_class.__name__}, nodes={self.nodes}")
 
     def __enter__(self) -> PathosPool:
         """
@@ -279,9 +297,7 @@ class MultiPool:
                     if self.debug:
                         logger.debug(f"Traceback: {traceback.format_exc()}")
 
-                    raise RuntimeError(
-                        f"Error during parallel map operation: {e}"
-                    ) from e
+                    raise RuntimeError(f"Error during parallel map operation: {e}") from e
 
             # Replace the map method with our enhanced version
             self.pool.map = enhanced_map  # type: ignore
@@ -315,24 +331,18 @@ class MultiPool:
         if self.pool:
             # Log the exception if one occurred
             if exc_type is not None and self.debug:
-                logger.debug(
-                    f"Cleaning up pool after exception: {exc_type.__name__}: {exc_value}"
-                )
+                logger.debug(f"Cleaning up pool after exception: {exc_type.__name__}: {exc_value}")
 
             try:
                 # Special handling for KeyboardInterrupt
                 if exc_type is KeyboardInterrupt:
                     # Terminate immediately on keyboard interrupt for faster response
                     if self.debug:
-                        logger.debug(
-                            "KeyboardInterrupt detected, terminating pool immediately"
-                        )
+                        logger.debug("KeyboardInterrupt detected, terminating pool immediately")
                     self.pool.terminate()
                     self.pool.join()
                     if self.debug:
-                        logger.debug(
-                            "Pool terminated and joined after KeyboardInterrupt"
-                        )
+                        logger.debug("Pool terminated and joined after KeyboardInterrupt")
                 else:
                     # Normal graceful shutdown
                     # Close the pool and join to wait for all tasks to complete
@@ -345,9 +355,7 @@ class MultiPool:
             except Exception as e:
                 # If close/join fails, ensure terminate is called
                 if self.debug:
-                    logger.debug(
-                        f"Error during pool cleanup: {e}, attempting terminate"
-                    )
+                    logger.debug(f"Error during pool cleanup: {e}, attempting terminate")
                 try:
                     self.pool.terminate()
                     self.pool.join()
@@ -491,26 +499,20 @@ def mmap(
     # Validate the mapping method early
     valid_methods = ["map", "imap", "amap"]
     if how not in valid_methods:
-        raise ValueError(
-            f"Invalid mapping method: '{how}'. Must be one of {valid_methods}"
-        )
+        raise ValueError(f"Invalid mapping method: '{how}'. Must be one of {valid_methods}")
 
     # Use the global debug setting if not specified
     use_debug = DEBUG_MODE if debug is None else debug
 
     if use_debug:
-        logger.debug(
-            f"Creating mmap decorator with method={how}, get_result={get_result}"
-        )
+        logger.debug(f"Creating mmap decorator with method={how}, get_result={get_result}")
 
     def decorator(func: Callable[[T], U]) -> Callable[[Iterator[T]], Iterator[U]]:
         @wraps(func)
         def wrapper(iterable: Iterator[T], *args: Any, **kwargs: Any) -> Any:
             # Create a MultiPool context to manage the pool lifecycle
             if use_debug:
-                logger.debug(
-                    f"Executing {func.__name__} with {how} on {type(iterable).__name__}"
-                )
+                logger.debug(f"Executing {func.__name__} with {how} on {type(iterable).__name__}")
 
             try:
                 with MultiPool(debug=use_debug) as pool:
@@ -543,35 +545,42 @@ def mmap(
                                 f"WorkerError caught. Original: {we.original_exception}, Input: {we.input_item}, WorkerID: {we.worker_id}"
                             )
                         if we.original_exception is not None:
-                            raise we.original_exception from we # Let original error propagate
+                            raise we.original_exception from we  # Let original error propagate
                         else:
                             # If WorkerError has no original_exception, raise WorkerError itself.
                             raise we
-                    except KeyboardInterrupt: # Keyboard interrupt during mapping_method call
+                    except KeyboardInterrupt:  # Keyboard interrupt during mapping_method call
                         if use_debug:
                             logger.debug("KeyboardInterrupt detected during parallel execution")
-                        raise # Re-raise to be handled by MultiPool.__exit__ or outer try
+                        raise  # Re-raise to be handled by MultiPool.__exit__ or outer try
             # These except blocks handle errors from pool creation or propagated from execution.
             except KeyboardInterrupt:
-                if use_debug: logger.debug("KeyboardInterrupt in mmap wrapper")
+                if use_debug:
+                    logger.debug("KeyboardInterrupt in mmap wrapper")
                 raise
-            except WorkerError as we_outer: # This can happen if e.g. imap iterator is consumed outside
-                if use_debug: logger.debug(f"mmap outer: WorkerError's original: {we_outer.original_exception}")
+            except WorkerError as we_outer:  # This can happen if e.g. imap iterator is consumed outside
+                if use_debug:
+                    logger.debug(f"mmap outer: WorkerError's original: {we_outer.original_exception}")
                 if we_outer.original_exception is not None:
-                    raise we_outer.original_exception from we_outer # Propagate original error
-                raise # Raise WorkerError if no original_exception
-            except (ValueError, RuntimeError) as e: # Catch known errors from pool/mapping setup
-                if use_debug: logger.debug(f"mmap propagating known error: {type(e).__name__}: {e}")
+                    raise we_outer.original_exception from we_outer  # Propagate original error
+                raise  # Raise WorkerError if no original_exception
+            except (ValueError, RuntimeError) as e:  # Catch known errors from pool/mapping setup
+                if use_debug:
+                    logger.debug(f"mmap propagating known error: {type(e).__name__}: {e}")
                 raise
-            except Exception as e: # Catch any other unexpected errors
-                if type(e).__name__ == "CustomError": # Specific for tests, let it propagate
-                    if use_debug: logger.debug(f"mmap propagating CustomError: {e}")
+            except Exception as e:  # Catch any other unexpected errors
+                if type(e).__name__ == "CustomError":  # Specific for tests, let it propagate
+                    if use_debug:
+                        logger.debug(f"mmap propagating CustomError: {e}")
                     raise
                 error_msg = f"Unexpected error in mmap decorator operation: {e}"
                 logger.error(error_msg)
-                if use_debug: logger.debug(f"Traceback: {traceback.format_exc()}")
+                if use_debug:
+                    logger.debug(f"Traceback: {traceback.format_exc()}")
                 raise RuntimeError(error_msg) from e
+
         return wrapper
+
     return decorator
 
 

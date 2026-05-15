@@ -53,9 +53,7 @@ def large_data() -> list[int]:
 def run_parallel_operation(
     func: Callable[[int], int],
     data: list[int] | Iterator[int],
-    parallel_impl: Callable[
-        [Callable[[Any], Any]], Callable[[list[Any] | Iterator[Any]], Iterator[Any]]
-    ],
+    parallel_impl: Callable[[Callable[[Any], Any]], Callable[[list[Any] | Iterator[Any]], Iterator[Any]]],
 ) -> list[int]:
     """Run a parallel operation with given implementation."""
     parallel_func = parallel_impl(func)
@@ -114,9 +112,7 @@ class TestComputeIntensiveBenchmarks:
 
         # Run once to get reference result
         reference_impl = implementations["process_pool"]
-        reference_result = run_parallel_operation(
-            _compute_intensive, data, reference_impl
-        )
+        reference_result = run_parallel_operation(_compute_intensive, data, reference_impl)
 
         # Verify all implementations produce the same result
         results = {}
@@ -128,8 +124,7 @@ class TestComputeIntensiveBenchmarks:
         # Benchmark all implementations in a single call
         def run_all() -> dict[str, list[int]]:
             return {
-                name: run_parallel_operation(_compute_intensive, data, impl)
-                for name, impl in implementations.items()
+                name: run_parallel_operation(_compute_intensive, data, impl) for name, impl in implementations.items()
             }
 
         benchmark(run_all)

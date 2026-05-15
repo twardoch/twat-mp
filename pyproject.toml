@@ -54,6 +54,9 @@ Source = "https://github.com/twardoch/twat-mp"
 [project.entry-points."twat.plugins"]
 mp = "twat_mp"
 
+[project.scripts]
+twat-mp = "twat_mp:main"
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/twat_mp"]
 
@@ -158,6 +161,8 @@ ignore = [
     "C901",
     "DTZ005",
     "E501",
+    "EM101",
+    "EM102",
     "F401",
     "F811",
     "FBT001",
@@ -171,6 +176,7 @@ ignore = [
     "PLR0913",
     "PLR0915",
     "PLR2004",
+    "PLW0603",
     "S311",
     "S603",
     "S607",
