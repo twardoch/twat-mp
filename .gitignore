@@ -258,3 +258,6 @@ _private
 CLEANUP.txt
 REPO_CONTENT.txt
 ruvector.db
+dist/
+build/
+*.egg-info/

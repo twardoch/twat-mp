@@ -1,13 +1,8 @@
 """twat-mp: Parallel processing utilities for twat using pathos and aiomultiprocess."""
 
 from __future__ import annotations
+from .__version__ import __version__
 
-from importlib.metadata import PackageNotFoundError, version
-
-try:
-    __version__ = version("twat-mp")
-except PackageNotFoundError:
-    __version__ = "0.0.0-dev"
 
 from twat_mp.mp import (
     MultiPool,
