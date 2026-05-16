@@ -36,6 +36,7 @@ classifiers = [
 # -------------------
 # External packages required for the project to function
 dependencies = [
+    "fire>=0.6.0",   # CLI framework
     "pathos>=0.3.3", # Parallel processing library
     "twat>=1.8.1"
     # Main twat package
@@ -55,7 +56,11 @@ Source = "https://github.com/twardoch/twat-mp"
 mp = "twat_mp"
 
 [project.scripts]
-twat-mp = "twat_mp:main"
+twat-mp         = "twat_mp.__main__:main"
+twat-mp-version = "twat_mp.__main__:cmd_version"
+twat-mp-pmap    = "twat_mp.__main__:cmd_pmap"
+twat-mp-pfilter = "twat_mp.__main__:cmd_pfilter"
+twat-mp-bench   = "twat_mp.__main__:cmd_bench"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/twat_mp"]
