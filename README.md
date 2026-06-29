@@ -1,8 +1,14 @@
+<!-- this_file: README.md -->
 # twat-mp: Parallel Processing Utilities for Python
+
+[![PyPI](https://img.shields.io/pypi/v/twat-mp)](https://pypi.org/project/twat-mp/)
+[![Docs](https://img.shields.io/badge/docs-mkdocs-blue)](https://twardoch.github.io/twat-mp/)
 
 `twat-mp` is a Python library designed to simplify parallel processing. It leverages the power of the [Pathos](https://pathos.readthedocs.io/en/latest/) library for robust synchronous parallel operations and offers experimental support for asynchronous parallelism using [aiomultiprocess](https://github.com/omnilib/aiomultiprocess). Whether you're dealing with CPU-bound computations or I/O-bound tasks, `twat-mp` provides convenient tools to help you write efficient, parallelized Python code.
 
 This project is part of the [**twat**](https://pypi.org/project/twat/) collection of Python utilities.
+
+**Full documentation:** <https://twardoch.github.io/twat-mp/>
 
 ## Who is it For?
 

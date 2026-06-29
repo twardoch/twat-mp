@@ -21,10 +21,14 @@ from twat_mp.mp import (
 
 
 def main() -> None:
-    """CLI entry point for twat-mp."""
-    from twat_mp.__main__ import main as cli_main
+    """Lightweight plugin entry point — prints the installed version.
 
-    cli_main()
+    This is the callable used by the twat plugin registry.  The full CLI
+    dispatcher (Fire-based, with ``version``/``pmap``/``bench`` sub-commands)
+    is available via the ``twat-mp`` script entry point defined in
+    ``twat_mp.__main__``.
+    """
+    print(f"twat-mp v{__version__}")
 
 
 __all__ = [

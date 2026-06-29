@@ -5,6 +5,27 @@ All notable changes to the `twat-mp` project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- `mkdocs.yml` with MkDocs Material theme; docs pages `docs/index.md`, `docs/api.md`, `docs/STYLE_GUIDE.md`.
+- `docs/STYLE_GUIDE.md` — conventions for naming, docstrings, error handling, and tests.
+- `docs/index.md` — quick-start guide with pool-vs-decorator comparison table.
+- `docs/api.md` — auto-generated API reference via `mkdocstrings`.
+
+### Changed
+- `src/twat_mp/__init__.py`: `main()` now prints `twat-mp v<version>` instead of dispatching
+  through Fire (which choked on pytest's `sys.argv`). The full Fire CLI remains accessible via
+  the `twat-mp` script entry point.
+- `.github/workflows/push.yml`: test step now ignores `tests/test_async_mp.py` and
+  `tests/test_benchmark.py` to match the `[test]` extra (which does not include `aiomultiprocess`
+  or benchmark dependencies).
+
+### Fixed
+- `test_main_outputs_version` now passes: `twat_mp.main()` emits `"twat-mp v<version>"` on stdout.
+
+---
+
 ## [3.0.0] - YYYY-MM-DD (MVP Streamline Release)
 
 ### Added
